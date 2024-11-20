@@ -5,6 +5,9 @@ public class Bonus : MonoBehaviour
     public LayerMask CollisionLayers;
     public int Points = 1;
 
+    public GameObject SpawnPoint;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -28,6 +31,12 @@ public class Bonus : MonoBehaviour
       if (cScore != null) {
         cScore.AddScore(Points);
       }
+
+      SpawnBonus spawner = GameObject.FindObjectOfType<SpawnBonus>();
+     
+          spawner.BonusTaken(SpawnPoint);
+      
+      // spawner.BonusTaken();
 
       Destroy(gameObject);
     }
