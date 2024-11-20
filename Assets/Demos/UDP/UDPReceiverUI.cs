@@ -4,7 +4,7 @@ public class UDPReceiverUI : MonoBehaviour
 {
     public UDPReceiver Receiver;
     public TMPro.TMP_InputField InpPort;
-
+    public TMPro.TMP_InputField InpMessage;
     public TMPro.TMP_Text TxtMessage;
 
     public GameObject BtnListen;
@@ -35,5 +35,14 @@ public class UDPReceiverUI : MonoBehaviour
 
     public void Close() {
         Receiver.Close();
+    }
+
+    public void SendMessage() {
+        if (!Receiver.IsListening) return;
+        
+        string message = InpMessage.text;
+        if (string.IsNullOrEmpty(message)) return;
+        
+        Receiver.SendUDPMessage(message);
     }
 }

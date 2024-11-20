@@ -7,6 +7,9 @@ public class UDPSender : MonoBehaviour
     public int DestinationPort = 25000;
     public string DestinationIP = "127.0.0.1";
 
+    public delegate void MessageReceivedHandler(string message);
+    public event MessageReceivedHandler OnMessageReceived;
+
     UdpClient udp;
     IPEndPoint localEP;
 
@@ -29,10 +32,18 @@ public class UDPSender : MonoBehaviour
         try {
             IPEndPoint destEP = new IPEndPoint(IPAddress.Parse(DestinationIP), DestinationPort);
             udp.Send(bytes, bytes.Length, destEP);
-            
-        } catch (SocketException e)
-        {
+        } catch (SocketException e) {
             Debug.LogWarning(e.Message);
+        }
+    }
+
+    void Update() {
+        // Vérifie les messages entrants
+        if (udp != null && udp.Available > 0) {
+            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
+            byte[] data = udp.Receive(ref remoteEP);
+            string message = System.Text.Encoding.UTF8.GetString(data);
+            OnMessageReceived?.Invoke(message);
         }
     }
 
@@ -46,5 +57,4 @@ public class UDPSender : MonoBehaviour
             udp = null;
         }
     }
-
 }

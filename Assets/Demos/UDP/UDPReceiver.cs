@@ -8,6 +8,7 @@ public class UDPReceiver : MonoBehaviour
     UdpClient udp;
     IPEndPoint localEP;
     IPEndPoint sourceEP;
+    IPEndPoint lastSenderEP; // Pour stocker l'adresse de l'expéditeur
 
     public delegate void UDPMessageReceive(string message);
 
@@ -21,11 +22,9 @@ public class UDPReceiver : MonoBehaviour
 
         try
         {
-            // Local End-Point
             localEP = new IPEndPoint(IPAddress.Any, ListenPort);
             sourceEP = new IPEndPoint(IPAddress.Any, 0);
             
-            // Create the listener
             udp = new UdpClient();
             udp.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             udp.ExclusiveAddressUse = false;
@@ -41,6 +40,19 @@ public class UDPReceiver : MonoBehaviour
             Debug.LogWarning("Error creating UDP listener on port: " + ListenPort + ": " + ex.Message);
             CloseUDP();
             return false;
+        }
+    }
+
+    // Nouvelle méthode pour envoyer un message à l'expéditeur
+    public void SendUDPMessage(string message) {
+        if (udp == null || lastSenderEP == null) return;
+
+        try {
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(message);
+            udp.Send(bytes, bytes.Length, lastSenderEP);
+        }
+        catch (SocketException e) {
+            Debug.LogWarning("Error sending UDP message: " + e.Message);
         }
     }
 
@@ -62,28 +74,28 @@ public class UDPReceiver : MonoBehaviour
         ReceiveUDP();
     }
 
-
     private void ReceiveUDP() {
         if (udp == null) { return; }
 
         while (udp.Available > 0)
-		{
-			byte[] data = udp.Receive(ref sourceEP);
+        {
+            byte[] data = udp.Receive(ref sourceEP);
+            lastSenderEP = sourceEP; // Stocke l'adresse de l'expéditeur
 
-			try
-			{
-				ParseString(data);
-			}
-			catch (System.Exception ex)
-			{
-				Debug.LogWarning("Error receiving UDP message: " + ex.Message);
-			}
-		}
+            try
+            {
+                ParseString(data);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning("Error receiving UDP message: " + ex.Message);
+            }
+        }
     }
 
     private void ParseString(byte[] bytes) {
         string message = System.Text.Encoding.UTF8.GetString(bytes);
-        OnMessageReceive.Invoke(message);
+        OnMessageReceive?.Invoke(message);
     }
 
     private void CloseUDP() {
@@ -92,5 +104,6 @@ public class UDPReceiver : MonoBehaviour
             udp = null;
         }
         OnMessageReceive = null;
+        lastSenderEP = null;
     }
 }
