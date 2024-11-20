@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
+using System.Text;
 
 public class EntityData {
     public string ID;
@@ -144,6 +145,8 @@ public class TCPServer : MonoBehaviour
                             rotation = initialRotation 
                         };
                         ConnectedClients.Add(newClient);
+                        string jsonData = JsonUtility.ToJson(newClient);
+                        BroadcastTCPMessage(jsonData);
                     }
                     else if (action == "disconnect")
                     {
