@@ -7,21 +7,16 @@ public class Engineer : MonoBehaviour
 
     private void Start()
     {
-        // Trouver le composant TCPClient dans la scène
-        tcpClient = FindObjectOfType<TCPClient>();
+        tcpClient = Object.FindFirstObjectByType<TCPClient>();
         if (tcpClient == null)
         {
             Debug.LogError("TCPClient non trouvé. Assure-toi qu'il est ajouté à la scène.");
             return;
         }
 
-        // Générer un ID unique pour ce joueur
         playerID = System.Guid.NewGuid().ToString();
 
-        // Envoyer le message `connect <playerID>` au serveur
         ConnectToServer();
-
-        // Log pour confirmer la connexion
         Debug.Log($"Joueur connecté avec l'ID : {playerID}");
     }
 
