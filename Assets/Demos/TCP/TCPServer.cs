@@ -3,6 +3,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
 
+public class EntityData {
+    public string ID;
+    public Vector3 position;
+    public Vector3 rotation;
+}
+
 public class TCPServer : MonoBehaviour
 {
     public int ListenPort = 25000;
@@ -16,6 +22,8 @@ public class TCPServer : MonoBehaviour
     private TCPMessageReceive OnMessageReceive;
 
     private List<TcpClient> Connections = new List<TcpClient>();
+
+    private List<EntityData> ConnectedClients = new List<EntityData>();
 
     public bool Listen(TCPMessageReceive handler) {
         if (tcp != null) {
@@ -53,7 +61,7 @@ public class TCPServer : MonoBehaviour
 
     public int ConnectionCount {
         get {
-            return Connections.Count;
+            return ConnectedClients.Count;
         }
     }
 
@@ -118,9 +126,33 @@ public class TCPServer : MonoBehaviour
                 byte[] data = new byte[client.Available];
                 client.GetStream().Read(data, 0, client.Available);
 
+                string[] parts = ParseString(data).Split(' ');
+                string action = parts[0].ToString();
+                string clientId = parts[1].ToString();
+                // TODO remplacer le randomSpawnPosition par des vrais positions sur la map pour faire apparaitres de gens au hasard sur la carte
+                Vector3 randomSpawnPosition = new Vector3(Random.Range(-10, 10), 0.318325f, Random.Range(-10, 10));
+                Vector3 initialRotation = new Vector3(0, 0, 0);
+
                 try
                 {
-                    ParseString(data);
+                    if (action == "connect")
+                    {
+                        EntityData newClient = new EntityData
+                        {
+                            ID = clientId,
+                            position = randomSpawnPosition,
+                            rotation = initialRotation 
+                        };
+                        ConnectedClients.Add(newClient);
+                    }
+                    else if (action == "disconnect")
+                    {
+                        RemoveClient(clientId);
+                    }
+                    else
+                    {
+                        Debug.Log("Ni 'connect' ni 'disconnect' ne sont présents dans la chaîne.");
+                    }
                 }
                 catch (System.Exception ex)
                 {
@@ -130,9 +162,21 @@ public class TCPServer : MonoBehaviour
         }
     }
 
-    private void ParseString(byte[] bytes) {
+    private string ParseString(byte[] bytes) {
         string message = System.Text.Encoding.UTF8.GetString(bytes);
         OnMessageReceive.Invoke(message);
+        return message;
+    }
+
+    private void RemoveClient(string id)
+    {
+        for (int i = 0; i < ConnectedClients.Count; i++) 
+            {
+                if (id == ConnectedClients[i].ID)
+                {
+                    ConnectedClients.RemoveAt(i);
+                }
+            }
     }
 
     private void CloseTCP() {
