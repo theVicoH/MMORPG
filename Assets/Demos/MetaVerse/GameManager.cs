@@ -3,35 +3,44 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private GameObject engineerPrefab; // Prefab du joueur
-    private Dictionary<string, GameObject> players = new Dictionary<string, GameObject>(); // Liste des joueurs connectés
-
+    [SerializeField] private GameObject engineerPrefab;
     [SerializeField] private TCPServer tcpServer;
+
+    private Dictionary<string, GameObject> players = new Dictionary<string, GameObject>();
 
     void Start()
     {
-        // Démarre le serveur et écoute les messages
-        tcpServer.Listen(OnMessageReceived);
+        // Démarre l'écoute et configure le callback
+       // tcpServer.Listen(OnMessageReceived);
     }
 
-    // Callback appelé quand un message est reçu
+    // Callback pour traiter les messages du serveur
     private void OnMessageReceived(string message)
     {
         Debug.Log($"Message reçu : {message}");
 
-        if (message.StartsWith("CONNECT:"))
+        // Découper le message en parties
+        string[] parts = message.Split(' ');
+        if (parts.Length < 2)
         {
-            string playerID = message.Split(':')[1];
-            OnPlayerConnected(playerID);
+            Debug.LogWarning("Message mal formé : " + message);
+            return;
         }
-        else if (message.StartsWith("DISCONNECT:"))
+
+        string action = parts[0];
+        string clientId = parts[1];
+
+        if (action == "connect")
         {
-            string playerID = message.Split(':')[1];
-            OnPlayerDisconnected(playerID);
+            OnPlayerConnected(clientId);
+        }
+        else if (action == "disconnect")
+        {
+            OnPlayerDisconnected(clientId);
         }
     }
 
-    // Instancie un joueur lors de la connexion
+    // Connexion d'un joueur
     private void OnPlayerConnected(string playerID)
     {
         if (players.ContainsKey(playerID))
@@ -40,17 +49,15 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Instancier le joueur à une position aléatoire
-        Vector3 spawnPosition = new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
-        GameObject newPlayer = Instantiate(engineerPrefab, spawnPosition, Quaternion.identity);
 
-        // Ajouter le joueur à la liste
+        // Instancier le joueur
+        GameObject newPlayer = Instantiate(engineerPrefab);
         players[playerID] = newPlayer;
 
-        Debug.Log($"Nouveau joueur connecté : {playerID}, Position : {spawnPosition}");
+        Debug.Log($"Nouveau joueur connecté : {playerID}");
     }
 
-    // Supprime un joueur lors de la déconnexion
+    // Déconnexion d'un joueur
     private void OnPlayerDisconnected(string playerID)
     {
         if (!players.ContainsKey(playerID))
@@ -59,13 +66,12 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Supprime le GameObject du joueur
+        // Supprimer le GameObject du joueur
         GameObject player = players[playerID];
         Destroy(player);
-
-        // Retirer le joueur de la liste
         players.Remove(playerID);
 
         Debug.Log($"Joueur déconnecté : {playerID}");
     }
 }
+

@@ -2,49 +2,64 @@ using UnityEngine;
 
 public class Engineer : MonoBehaviour
 {
-    private string playerID; // ID unique pour ce joueur
-    private Vector3 position;
-
+    private string playerID;
     private TCPClient tcpClient;
 
     private void Start()
     {
+        // Trouver le composant TCPClient dans la scène
         tcpClient = FindObjectOfType<TCPClient>();
+        if (tcpClient == null)
+        {
+            Debug.LogError("TCPClient non trouvé. Assure-toi qu'il est ajouté à la scène.");
+            return;
+        }
 
-        // Génère un ID unique pour ce joueur
+        // Générer un ID unique pour ce joueur
         playerID = System.Guid.NewGuid().ToString();
 
-        // Envoie un message de connexion au serveur
-        SendMessageToServer($"CONNECT:{playerID}");
+        // Envoyer le message `connect <playerID>` au serveur
+        ConnectToServer();
 
-        // Log la position initiale
-        position = transform.position;
-        Debug.Log($"Joueur connecté - ID : {playerID}, Position : {position}");
-    }
-
-    private void Update()
-    {
-        // Met à jour et log la position en continu
-        position = transform.position;
-        Debug.Log($"Position actuelle - ID : {playerID}, Position : {position}");
+        // Log pour confirmer la connexion
+        Debug.Log($"Joueur connecté avec l'ID : {playerID}");
     }
 
     private void OnDestroy()
     {
-        // Envoie un message de déconnexion au serveur
-        SendMessageToServer($"DISCONNECT:{playerID}");
+        DisconnectFromServer();
         Debug.Log($"Joueur déconnecté - ID : {playerID}");
     }
 
-    private void SendMessageToServer(string message)
+    // Méthode pour envoyer le message de connexion au serveur
+    private void ConnectToServer()
     {
         if (tcpClient != null && tcpClient.IsConnected)
         {
-            tcpClient.SendTCPMessage(message);
+            tcpClient.SendTCPMessage($"connect {playerID}");
         }
         else
         {
-            Debug.LogWarning("Impossible d'envoyer le message, TCPClient non connecté.");
+            Debug.LogError("Impossible de se connecter au serveur. TCPClient non connecté.");
         }
+    }
+
+    // Méthode pour envoyer le message de déconnexion au serveur
+    private void DisconnectFromServer()
+    {
+        if (tcpClient != null && tcpClient.IsConnected)
+        {
+            tcpClient.SendTCPMessage($"disconnect {playerID}");
+        }
+        else
+        {
+            Debug.LogWarning("Impossible d'envoyer le message de déconnexion. TCPClient non connecté.");
+        }
+    }
+
+    // Permet de récupérer l'ID du joueur si nécessaire
+    public string GetPlayerID()
+    {
+        return playerID;
     }
 }
