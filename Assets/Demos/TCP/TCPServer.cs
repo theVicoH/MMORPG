@@ -5,9 +5,28 @@ using System.Collections.Generic;
 using System.Text;
 
 [System.Serializable]
+public class SerializableEndPoint
+{
+    public string Address;
+    public int Port;
+
+    public SerializableEndPoint(IPEndPoint endPoint)
+    {
+        Address = endPoint.Address.ToString();
+        Port = endPoint.Port;
+    }
+
+    public IPEndPoint ToIPEndPoint()
+    {
+        return new IPEndPoint(IPAddress.Parse(Address), Port);
+    }
+}
+
+[System.Serializable]
 public class EntityData
 {
     public string ID;
+    public SerializableEndPoint RemoteEndPoint;
     public Vector3 position;
     public Vector3 rotation;
     public int score;
@@ -16,7 +35,7 @@ public class EntityData
 [System.Serializable]
 public class EntityDataList
 {
-    public List<EntityData> entities;
+    public List<string> entities;
 }
 
 [System.Serializable]
@@ -40,7 +59,8 @@ public class TCPServer : MonoBehaviour
 
     private TcpListener tcp;
     private List<TcpClient> Connections = new List<TcpClient>();
-    private List<EntityData> ConnectedClients = new List<EntityData>();
+    public List<EntityData> ConnectedClients = new List<EntityData>();
+    private List<string> ConnectedClientsIds = new List<string>();
 
     public delegate void TCPMessageReceive(string message);
     private TCPMessageReceive OnMessageReceive;
@@ -209,16 +229,16 @@ public class TCPServer : MonoBehaviour
                     if (action == "connect")
                     {
                         string clientId = parts[1];
-                        HandleConnect(clientId, randomPosition, defaultRotation, 0);
+                        HandleConnect(clientId, (IPEndPoint)client.Client.RemoteEndPoint, randomPosition, defaultRotation, 0);
                     }
                     else if (action == "disconnect")
                     {
                         string clientId = parts[1];
                         HandleDisconnect(clientId);
                     }
-                    else if(action == "getConnectedClients")
+                    else if(action == "getConnectedClientsIds")
                     {
-                        sendConnectedClients();
+                        sendConnectedClientsIds();
                     }
                     else if (action == "getBonus")
                     {
@@ -241,7 +261,7 @@ public class TCPServer : MonoBehaviour
                     {
                         string clientId = parts[1];
                         IncrementClientScore(clientId);
-                        sendConnectedClients();
+                        sendConnectedClientsIds();
                     }
                     else
                     {
@@ -256,25 +276,24 @@ public class TCPServer : MonoBehaviour
         }
     }
 
-    private void HandleConnect(string clientId, Vector3 position, Vector3 rotation, int score)
+    private void HandleConnect(string clientId, IPEndPoint RemoteEndPoint, Vector3 position, Vector3 rotation, int score)
     {
         EntityData newClient = new EntityData
         {
             ID = clientId,
+            RemoteEndPoint = new SerializableEndPoint(RemoteEndPoint),
             position = position,
             rotation = rotation,
             score = score
         };
         ConnectedClients.Add(newClient);
-
-        BroadcastPlayerState(clientId, position, rotation, score);
-        Debug.Log($"Client connected: {clientId}, Position: {position}, Rotation: {rotation}");
+        sendConnectedClientsIds();
     }
 
     private void HandleDisconnect(string clientId)
     {
         ConnectedClients.RemoveAll(client => client.ID == clientId);
-        sendConnectedClients();
+        sendConnectedClientsIds();
     }
 
     private void UpdateBonusIsActive(string bonusId, bool newIsActive)
@@ -299,9 +318,10 @@ public class TCPServer : MonoBehaviour
         }
     }
 
-    private void sendConnectedClients()
+    private void sendConnectedClientsIds()
     {
-        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
+        UpdateConnectedClientsIds();
+        EntityDataList dataList = new EntityDataList { entities = ConnectedClientsIds };
         string jsonData = JsonUtility.ToJson(dataList);
         BroadcastTCPMessage(jsonData);
     }
@@ -311,6 +331,15 @@ public class TCPServer : MonoBehaviour
         BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
         string jsonData = JsonUtility.ToJson(wrapper);
         BroadcastTCPMessage(jsonData);
+    }
+
+    private void UpdateConnectedClientsIds()
+    {
+        ConnectedClientsIds.Clear();
+        foreach (var client in ConnectedClients)
+        {
+            ConnectedClientsIds.Add(client.ID);
+        }
     }
 
     private string ParseString(byte[] bytes)
@@ -329,18 +358,5 @@ public class TCPServer : MonoBehaviour
         }
         Connections.Clear();
         OnMessageReceive = null;
-    }
-
-    public void BroadcastPlayerState(string playerID, Vector3 position, Vector3 rotation, int score)
-    {
-        EntityData playerData = new EntityData
-        {
-            ID = playerID,
-            position = position,
-            rotation = rotation,
-            score = score
-        };
-
-        sendConnectedClients();
     }
 }

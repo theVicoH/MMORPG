@@ -73,8 +73,6 @@ public class GameManager : MonoBehaviour
         newPlayer.transform.position = randomPosition;
         newPlayer.transform.eulerAngles = defaultRotation;
 
-        tcpServer.BroadcastPlayerState(playerID, randomPosition, defaultRotation, 0);
-
         Debug.Log($"Joueur connecté : {playerID}, Position : {randomPosition}, Rotation : {defaultRotation}");
     }
 
