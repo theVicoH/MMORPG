@@ -14,17 +14,8 @@ connect clientId
 ##### Valeur de retour: <br>
 ```bash
 {
-    "entities": un tableau avec des EntityData
+    "entities": un tableau avec les ID des clients connectés
 }
-
-# EntityData est un objet composé comme ceci : 
-# public class EntityData
-# {
-#     public string ID;         // Identifiant unique de l'entité
-#     public Vector3 position;  // Position de l'entité dans l'espace (x, y, z)
-#     public Vector3 rotation;  // Rotation de l'entité dans l'espace (x, y, z)
-#     public int score;         // Score associé à l'entité
-# }
 ```
 
 #### Se déconnecter du server
@@ -37,38 +28,20 @@ disconnect clientId
 ##### Valeur de retour: <br>
 ```bash
 {
-    "entities": un tableau avec des EntityData
+    "entities": un tableau avec les ID des clients connectés
 }
-
-# EntityData est un objet composé comme ceci : 
-# public class EntityData
-# {
-#     public string ID;         // Identifiant unique de l'entité
-#     public Vector3 position;  // Position de l'entité dans l'espace (x, y, z)
-#     public Vector3 rotation;  // Rotation de l'entité dans l'espace (x, y, z)
-#     public int score;         // Score associé à l'entité
-# }
 ```
 
 #### Récupérer tous les clients connectés au serveur
 ```bash
-getConnectedClients
+getConnectedClientsIds
 ```
 
 ##### Valeur de retour: <br>
 ```bash
 {
-    "entities": un tableau avec des EntityData
+    "entities": un tableau avec les ID des clients connectés
 }
-
-# EntityData est un objet composé comme ceci : 
-# public class EntityData
-# {
-#     public string ID;         // Identifiant unique de l'entité
-#     public Vector3 position;  // Position de l'entité dans l'espace (x, y, z)
-#     public Vector3 rotation;  // Rotation de l'entité dans l'espace (x, y, z)
-#     public int score;         // Score associé à l'entité
-# }
 ```
 
 ### Bonus
@@ -129,15 +102,6 @@ incrementScore clientId
 ##### Valeur de retour: <br>
 ```bash
 {
-    "entities": un tableau avec des EntityData
+    "entities": un tableau avec les ID des clients connectés
 }
-
-# EntityData est un objet composé comme ceci : 
-# public class EntityData
-# {
-#     public string ID;         // Identifiant unique de l'entité
-#     public Vector3 position;  // Position de l'entité dans l'espace (x, y, z)
-#     public Vector3 rotation;  // Rotation de l'entité dans l'espace (x, y, z)
-#     public int score;         // Score associé à l'entité
-# }
 ```
