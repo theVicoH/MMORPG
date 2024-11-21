@@ -29,7 +29,7 @@ public class UDPSender : MonoBehaviour
         try {
             IPEndPoint destEP = new IPEndPoint(IPAddress.Parse(DestinationIP), DestinationPort);
             udp.Send(bytes, bytes.Length, destEP);
-            
+
         } catch (SocketException e)
         {
             Debug.LogWarning(e.Message);
