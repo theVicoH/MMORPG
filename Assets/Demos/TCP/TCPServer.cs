@@ -10,6 +10,7 @@ public class EntityData
     public string ID;
     public Vector3 position;
     public Vector3 rotation;
+    public int score;
 }
 
 [System.Serializable]
@@ -208,7 +209,7 @@ public class TCPServer : MonoBehaviour
                     if (action == "connect")
                     {
                         string clientId = parts[1];
-                        HandleConnect(clientId, randomPosition, defaultRotation);
+                        HandleConnect(clientId, randomPosition, defaultRotation, 0);
                     }
                     else if (action == "disconnect")
                     {
@@ -242,6 +243,14 @@ public class TCPServer : MonoBehaviour
                         string jsonData = JsonUtility.ToJson(wrapper);
                         BroadcastTCPMessage(jsonData);
                     }
+                    else if (action == "incrementScore")
+                    {
+                        string clientId = parts[1];
+                        IncrementClientScore(clientId);
+                        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
+                        string jsonData = JsonUtility.ToJson(dataList);
+                        BroadcastTCPMessage(jsonData);
+                    }
                     else
                     {
                         Debug.LogWarning($"Unknown action: {action}");
@@ -255,17 +264,18 @@ public class TCPServer : MonoBehaviour
         }
     }
 
-    private void HandleConnect(string clientId, Vector3 position, Vector3 rotation)
+    private void HandleConnect(string clientId, Vector3 position, Vector3 rotation, int score)
     {
         EntityData newClient = new EntityData
         {
             ID = clientId,
             position = position,
-            rotation = rotation
+            rotation = rotation,
+            score = score
         };
         ConnectedClients.Add(newClient);
 
-        BroadcastPlayerState(clientId, position, rotation);
+        BroadcastPlayerState(clientId, position, rotation, score);
         Debug.Log($"Client connected: {clientId}, Position: {position}, Rotation: {rotation}");
     }
 
@@ -288,6 +298,17 @@ public class TCPServer : MonoBehaviour
         }
     }
 
+    private void IncrementClientScore(string clientId)
+    {
+        for(int i = 0; i < ConnectedClients.Count; i++)
+        {
+            if(clientId == ConnectedClients[i].ID)
+            {
+                ConnectedClients[i].score++;
+            }
+        }
+    }
+
     private string ParseString(byte[] bytes)
     {
         string message = Encoding.UTF8.GetString(bytes);
@@ -306,13 +327,14 @@ public class TCPServer : MonoBehaviour
         OnMessageReceive = null;
     }
 
-    public void BroadcastPlayerState(string playerID, Vector3 position, Vector3 rotation)
+    public void BroadcastPlayerState(string playerID, Vector3 position, Vector3 rotation, int score)
     {
         EntityData playerData = new EntityData
         {
             ID = playerID,
             position = position,
-            rotation = rotation
+            rotation = rotation,
+            score = score
         };
 
         EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
