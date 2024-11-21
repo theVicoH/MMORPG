@@ -4,11 +4,18 @@ using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Text;
 
+[System.Serializable]
 public class EntityData
 {
     public string ID;
     public Vector3 position;
     public Vector3 rotation;
+}
+
+[System.Serializable]
+public class EntityDataList
+{
+    public List<EntityData> entities;
 }
 
 [System.Serializable]
@@ -208,6 +215,12 @@ public class TCPServer : MonoBehaviour
                         string clientId = parts[1];
                         HandleDisconnect(clientId);
                     }
+                    else if(action == "getConnectedClients")
+                    {
+                        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
+                        string jsonData = JsonUtility.ToJson(dataList);
+                        BroadcastTCPMessage(jsonData);
+                    }
                     else if (action == "getBonus")
                     {
                         BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
@@ -259,7 +272,9 @@ public class TCPServer : MonoBehaviour
     private void HandleDisconnect(string clientId)
     {
         ConnectedClients.RemoveAll(client => client.ID == clientId);
-        Debug.Log($"Client disconnected: {clientId}");
+        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
+        string jsonData = JsonUtility.ToJson(dataList);
+        BroadcastTCPMessage(jsonData);
     }
 
     private void UpdateBonusIsActive(string bonusId, bool newIsActive)
@@ -300,9 +315,8 @@ public class TCPServer : MonoBehaviour
             rotation = rotation
         };
 
-        string jsonData = JsonUtility.ToJson(playerData);
+        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
+        string jsonData = JsonUtility.ToJson(dataList);
         BroadcastTCPMessage(jsonData);
-
-        Debug.Log($"Player state broadcasted: {jsonData}");
     }
 }
