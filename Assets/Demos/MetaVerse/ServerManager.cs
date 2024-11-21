@@ -6,11 +6,9 @@ public class ServerManager : MonoBehaviour
 {
     public UDPService UDP;
     public int ListenPort = 25000;
-
     public Dictionary<string, IPEndPoint> Clients = new Dictionary<string, IPEndPoint>(); 
 
     void Awake() {
-        // Desactiver mon objet si je ne suis pas le serveur
         if (!Globals.IsServer) {
             gameObject.SetActive(false);
         }
@@ -26,25 +24,25 @@ public class ServerManager : MonoBehaviour
                     sender.Address.ToString() + ":" + sender.Port 
                     + " =>" + message);
                 
-                switch (message) {
-                    case "coucou":
-                        // Ajouter le client à mon dictionnaire
-                        string addr = sender.Address.ToString() + ":" + sender.Port;
-                        if (!Clients.ContainsKey(addr)) {
-                            Clients.Add(addr, sender);
-                        }
-                        Debug.Log("There are " + Clients.Count + " clients present.");
-
-                        UDP.SendUDPMessage("welcome!", sender);
-                        break;
+                if (message == "coucou") {
+                    string addr = sender.Address.ToString() + ":" + sender.Port;
+                    if (!Clients.ContainsKey(addr)) {
+                        Clients.Add(addr, sender);
+                    }
+                    Debug.Log("There are " + Clients.Count + " clients present.");
+                    UDP.SendUDPMessage("welcome!", sender);
                 }
-                
-                //@todo : do something with the message that has arrived! 
+                else if (message.StartsWith("CHAR_UPDATE")) {
+                    BroadcastUDPMessage(message, sender);
+                }
             };
     }
 
-    public void BroadcastUDPMessage(string message) {
+    public void BroadcastUDPMessage(string message, IPEndPoint sender) {
         foreach (KeyValuePair<string, IPEndPoint> client in Clients) {
+            if (client.Value.Address.Equals(sender.Address) && client.Value.Port == sender.Port) {
+                continue;
+            }
             UDP.SendUDPMessage(message, client.Value);
         }
     }

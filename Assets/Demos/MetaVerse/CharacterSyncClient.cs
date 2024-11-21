@@ -1,31 +1,35 @@
 using UnityEngine;
-using System.Net;
+
 public class CharacterSyncClient : MonoBehaviour
 {
-    UDPService UDP;
+    ClientManager ClientManager;
     Animator anim;
+    float NextUpdateTimeout = -1;
 
     void Awake() {
         if (Globals.IsServer) {
             enabled = false;
+            return;
         }
         anim = GetComponent<Animator>();
     }
 
     void Start() {
-        UDP = FindFirstObjectByType<UDPService>();
+        ClientManager = FindFirstObjectByType<ClientManager>();
+    }
 
-        UDP.OnMessageReceived += (string message, IPEndPoint sender) => {
-            if (!message.StartsWith("CHAR_UPDATE")) { return; }
+    void Update() {
+        if (Time.time > NextUpdateTimeout) {
+            // Envoie l'état au serveur
+            CharacterState state = new CharacterState{
+                Position = transform.position,
+                Rotation = transform.rotation,
+                WalkAnimation = anim.GetFloat("Walk")
+            };
 
-            string[] tokens = message.Split('|');
-            string json = tokens[1];
-
-            CharacterState state = JsonUtility.FromJson<CharacterState>(json);
-            
-            transform.position = state.Position;
-            transform.rotation = state.Rotation;
-            anim.SetFloat("Walk", state.WalkAnimation);
-        };
+            string json = JsonUtility.ToJson(state);
+            ClientManager.UDP.SendUDPMessage("CHAR_UPDATE|" + json, ClientManager.ServerEndpoint);
+            NextUpdateTimeout = Time.time + 0.03f;
+        }
     }
 }
