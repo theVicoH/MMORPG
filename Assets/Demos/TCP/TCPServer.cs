@@ -11,6 +11,20 @@ public class EntityData
     public Vector3 rotation;
 }
 
+[System.Serializable]
+public class BonusData
+{
+    public string ID;
+    public Vector3 position;
+    public bool isActive;
+}
+
+[System.Serializable]
+public class BonusListWrapper
+{
+    public List<BonusData> bonuses;
+}
+
 public class TCPServer : MonoBehaviour
 {
     public int ListenPort = 25000;
@@ -22,6 +36,47 @@ public class TCPServer : MonoBehaviour
 
     public delegate void TCPMessageReceive(string message);
     private TCPMessageReceive OnMessageReceive;
+
+    private List<BonusData> bonus = new List<BonusData>
+    {
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(246.910385f, 0.785560608f, 254.503769f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(253.199997f, 0.785560608f, 252.179993f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(243.020004f, 0.785560608f, 252.179993f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(248.919998f, 0.785560608f, 238.419998f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(239.669998f, 0.785560608f, 242.979996f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(228.899994f, 0.785560608f, 252.580002f),
+            isActive = true
+        }
+    };
+
 
     public bool IsListening
     {
@@ -135,9 +190,8 @@ public class TCPServer : MonoBehaviour
 
                 string[] parts = ParseString(data).Split(' ');
                 string action = parts[0];
-                string clientId = parts[1];
 
-                 // TODO remplacer le randomSpawnPosition par des vrais positions sur la map pour faire apparaitres de gens au hasard sur la carte
+                // TODO remplacer le randomSpawnPosition par des vrais positions sur la map pour faire apparaitres de gens au hasard sur la carte
                 Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0.318325f, Random.Range(-10, 10));
                 Vector3 initialRotation = new Vector3(0, 0, 0);
                 Vector3 defaultRotation = Vector3.zero;
@@ -146,11 +200,34 @@ public class TCPServer : MonoBehaviour
                 {
                     if (action == "connect")
                     {
+                        string clientId = parts[1];
                         HandleConnect(clientId, randomPosition, defaultRotation);
                     }
                     else if (action == "disconnect")
                     {
+                        string clientId = parts[1];
                         HandleDisconnect(clientId);
+                    }
+                    else if (action == "getBonus")
+                    {
+                        BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
+                        string jsonData = JsonUtility.ToJson(wrapper);
+                        BroadcastTCPMessage(jsonData);
+                    }
+                    else if (action == "updateBonus")
+                    {
+                        string bonusId = parts[1];
+                        string newIsActive = parts[2];
+                        if (newIsActive == "true")
+                        {
+                            UpdateBonusIsActive(bonusId, true);
+                        } else if (newIsActive == "false")
+                        {
+                            UpdateBonusIsActive(bonusId, false);
+                        }
+                        BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
+                        string jsonData = JsonUtility.ToJson(wrapper);
+                        BroadcastTCPMessage(jsonData);
                     }
                     else
                     {
@@ -183,6 +260,17 @@ public class TCPServer : MonoBehaviour
     {
         ConnectedClients.RemoveAll(client => client.ID == clientId);
         Debug.Log($"Client disconnected: {clientId}");
+    }
+
+    private void UpdateBonusIsActive(string bonusId, bool newIsActive)
+    {
+        for(int i = 0; i < bonus.Count; i++)
+        {
+            if(bonusId == bonus[i].ID)
+            {
+                bonus[i].isActive = newIsActive;
+            }
+        }
     }
 
     private string ParseString(byte[] bytes)
