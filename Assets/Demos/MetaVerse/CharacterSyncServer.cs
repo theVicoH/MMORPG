@@ -25,7 +25,7 @@ public class CharacterSyncServer : MonoBehaviour
         ServerMan = FindFirstObjectByType<ServerManager>();
 
         ServerMan.UDP.OnMessageReceived += (string message, IPEndPoint sender) => {
-            if (message.StartsWith("CHAR_UPDATE")) {
+            if (message.StartsWith("CHAR_POS")) {
                 string[] tokens = message.Split('|');
                 string json = tokens[1];
                 CharacterState state = JsonUtility.FromJson<CharacterState>(json);

@@ -28,7 +28,7 @@ public class CharacterSyncClient : MonoBehaviour
             };
 
             string json = JsonUtility.ToJson(state);
-            ClientManager.UDP.SendUDPMessage("CHAR_UPDATE|" + json, ClientManager.ServerEndpoint);
+            ClientManager.UDP.SendUDPMessage("CHAR_POS|" + json, ClientManager.ServerEndpoint);
             NextUpdateTimeout = Time.time + 0.03f;
         }
     }

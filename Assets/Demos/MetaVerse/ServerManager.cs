@@ -31,9 +31,23 @@ public class ServerManager : MonoBehaviour
                     }
                     Debug.Log("There are " + Clients.Count + " clients present.");
                     UDP.SendUDPMessage("welcome!", sender);
+                    return;
                 }
-                else if (message.StartsWith("CHAR_UPDATE")) {
-                    BroadcastUDPMessage(message, sender);
+
+                string[] parts = message.Split('|');
+                if (parts.Length < 2) return;
+
+                string command = parts[0];
+                string content = parts[1];
+
+                switch (command) {
+                    case "POS":
+                        BroadcastUDPMessage(message, sender);
+                        break;
+
+                    default:
+                        Debug.LogWarning("Unknown message type: " + command);
+                        break;
                 }
             };
     }
