@@ -218,15 +218,11 @@ public class TCPServer : MonoBehaviour
                     }
                     else if(action == "getConnectedClients")
                     {
-                        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
-                        string jsonData = JsonUtility.ToJson(dataList);
-                        BroadcastTCPMessage(jsonData);
+                        sendConnectedClients();
                     }
                     else if (action == "getBonus")
                     {
-                        BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
-                        string jsonData = JsonUtility.ToJson(wrapper);
-                        BroadcastTCPMessage(jsonData);
+                        sendBonus();
                     }
                     else if (action == "updateBonus")
                     {
@@ -239,17 +235,13 @@ public class TCPServer : MonoBehaviour
                         {
                             UpdateBonusIsActive(bonusId, false);
                         }
-                        BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
-                        string jsonData = JsonUtility.ToJson(wrapper);
-                        BroadcastTCPMessage(jsonData);
+                        sendBonus();
                     }
                     else if (action == "incrementScore")
                     {
                         string clientId = parts[1];
                         IncrementClientScore(clientId);
-                        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
-                        string jsonData = JsonUtility.ToJson(dataList);
-                        BroadcastTCPMessage(jsonData);
+                        sendConnectedClients();
                     }
                     else
                     {
@@ -282,9 +274,7 @@ public class TCPServer : MonoBehaviour
     private void HandleDisconnect(string clientId)
     {
         ConnectedClients.RemoveAll(client => client.ID == clientId);
-        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
-        string jsonData = JsonUtility.ToJson(dataList);
-        BroadcastTCPMessage(jsonData);
+        sendConnectedClients();
     }
 
     private void UpdateBonusIsActive(string bonusId, bool newIsActive)
@@ -307,6 +297,20 @@ public class TCPServer : MonoBehaviour
                 ConnectedClients[i].score++;
             }
         }
+    }
+
+    private void sendConnectedClients()
+    {
+        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
+        string jsonData = JsonUtility.ToJson(dataList);
+        BroadcastTCPMessage(jsonData);
+    }
+
+    private void sendBonus()
+    {
+        BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
+        string jsonData = JsonUtility.ToJson(wrapper);
+        BroadcastTCPMessage(jsonData);
     }
 
     private string ParseString(byte[] bytes)
@@ -337,8 +341,6 @@ public class TCPServer : MonoBehaviour
             score = score
         };
 
-        EntityDataList dataList = new EntityDataList { entities = ConnectedClients };
-        string jsonData = JsonUtility.ToJson(dataList);
-        BroadcastTCPMessage(jsonData);
+        sendConnectedClients();
     }
 }
