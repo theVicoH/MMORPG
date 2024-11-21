@@ -7,12 +7,12 @@ public class Engineer : MonoBehaviour
 
     private void Start()
     {
-        tcpClient = Object.FindFirstObjectByType<TCPClient>();
+       /* tcpClient = Object.FindFirstObjectByType<TCPClient>();
         if (tcpClient == null)
         {
             Debug.LogError("TCPClient non trouvé. Assure-toi qu'il est ajouté à la scène.");
             return;
-        }
+        } */
 
         playerID = System.Guid.NewGuid().ToString();
 
