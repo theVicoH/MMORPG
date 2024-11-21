@@ -2,6 +2,17 @@
 
 ## Liste des commandes pour intéragir avec le serveur TCP
 
+### Table des matières
+- [Client](#client)
+    - [Se connecter au server](#se-connecter-au-server)
+    - [Se déconnecter du server](#se-déconnecter-du-server)
+    - [Récupérer tous les clients connectés au serveur](#récupérer-tous-les-clients-connectés-au-serveur)
+- [Bonus](#bonus)
+    - [Récupérer tous les bonus du serveur](#récupérer-tous-les-bonus-du-serveur)
+    - [Changer le isActive d'un bonus](#changer-le-isactive-dun-bonus)
+- [Score](#score)
+    - [Incrémenter le score d'un client](#incrémenter-le-score-dun-client)
+
 ### Client
 
 #### Se connecter au server
