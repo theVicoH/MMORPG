@@ -105,6 +105,18 @@ public class TCPServer : MonoBehaviour
         }
     };
 
+    private List<Vector3> spawns = new List<Vector3>
+    {
+        new Vector3(253.32f, 1.34f, 248.2043f),
+        new Vector3(250.44f, 1.34f, 248.2043f),
+        new Vector3(247.38f, 1.34f, 248.2043f),
+        new Vector3(244.44f, 1.34f, 248.2043f),
+        new Vector3(241.58f, 1.34f, 248.2043f),
+        new Vector3(238.22f, 1.34f, 248.2043f),
+        new Vector3(235.35f, 1.34f, 248.2043f),
+        new Vector3(232.53f, 1.34f, 248.2043f),
+    };
+
 
     public bool IsListening
     {
@@ -219,16 +231,14 @@ public class TCPServer : MonoBehaviour
                 string[] parts = ParseString(data).Split(' ');
                 string action = parts[0];
 
-                // TODO remplacer le randomSpawnPosition par des vrais positions sur la map pour faire apparaitres de gens au hasard sur la carte
-                Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0.318325f, Random.Range(-10, 10));
-                Vector3 initialRotation = new Vector3(0, 0, 0);
-                Vector3 defaultRotation = Vector3.zero;
-
                 try
                 {
                     if (action == "connect")
                     {
                         string clientId = parts[1];
+                        Vector3 randomPosition = spawns[Random.Range(0, spawns.Count - 1)];
+                        spawns.Remove(randomPosition);
+                        Vector3 defaultRotation = Vector3.zero;
                         HandleConnect(clientId, (IPEndPoint)client.Client.RemoteEndPoint, randomPosition, defaultRotation, 0);
                     }
                     else if (action == "disconnect")
