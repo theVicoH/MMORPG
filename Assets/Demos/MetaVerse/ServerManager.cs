@@ -1,27 +1,63 @@
+using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 
 public class ServerManager : MonoBehaviour
 {
-    public UDPReceiver Receiver;
+    public UDPService UDP;
+    public int ListenPort = 25000;
+    public Dictionary<string, IPEndPoint> Clients = new Dictionary<string, IPEndPoint>(); 
 
-    void Awake(){
-    //desactiver l'objet si je ne suis pas le serveur
-        if (!Globals.IsServer){
-        gameObject.SetActive(false);
+    void Awake() {
+        if (!Globals.IsServer) {
+            gameObject.SetActive(false);
         }
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
-        Receiver.Listen(
-        (string message) => {
-            Debug.Log("message received from" + message);
-        });
+        UDP.Listen(ListenPort);
+
+        UDP.OnMessageReceived +=  
+            (string message, IPEndPoint sender) => {
+                Debug.Log("[SERVER] Message received from " + 
+                    sender.Address.ToString() + ":" + sender.Port 
+                    + " =>" + message);
+                
+                if (message == "coucou") {
+                    string addr = sender.Address.ToString() + ":" + sender.Port;
+                    if (!Clients.ContainsKey(addr)) {
+                        Clients.Add(addr, sender);
+                    }
+                    Debug.Log("There are " + Clients.Count + " clients present.");
+                    UDP.SendUDPMessage("welcome!", sender);
+                    return;
+                }
+
+                string[] parts = message.Split('|');
+                if (parts.Length < 2) return;
+
+                string command = parts[0];
+                string content = parts[1];
+
+                switch (command) {
+                    case "POS":
+                        BroadcastUDPMessage(message, sender);
+                        break;
+
+                    default:
+                        Debug.LogWarning("Unknown message type: " + command);
+                        break;
+                }
+            };
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
+    public void BroadcastUDPMessage(string message, IPEndPoint sender) {
+        foreach (KeyValuePair<string, IPEndPoint> client in Clients) {
+            if (client.Value.Address.Equals(sender.Address) && client.Value.Port == sender.Port) {
+                continue;
+            }
+            UDP.SendUDPMessage(message, client.Value);
+        }
     }
 }
