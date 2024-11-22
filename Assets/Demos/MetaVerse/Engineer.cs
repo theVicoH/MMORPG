@@ -35,7 +35,7 @@ public class Engineer : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Impossible de se connecter au serveur. TCPClient non connecté.");
+            // Debug.LogError("Impossible de se connecter au serveur. TCPClient non connecté.");
         }
     }
 
