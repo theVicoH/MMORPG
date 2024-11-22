@@ -84,7 +84,7 @@ public class ClientManager : MonoBehaviour
             Debug.LogError("[ClientManager] Prefab Engineer non assignée !");
             return;
         }
-
+        // ajouter les vrais positions
         Vector3 spawnPosition = new Vector3(247.37f, 0.318325f, 248.2043f);
         Quaternion spawnRotation = Quaternion.identity;
 
