@@ -216,7 +216,9 @@ public class TCPServer : MonoBehaviour
                 byte[] data = new byte[client.Available];
                 client.GetStream().Read(data, 0, client.Available);
 
-                string[] parts = ParseString(data).Split(' ');
+                string msg = ParseString(data);
+                Debug.Log("[CLIENT] " + msg);
+                string[] parts = msg.Split(' ');
                 string action = parts[0];
 
                 // TODO remplacer le randomSpawnPosition par des vrais positions sur la map pour faire apparaitres de gens au hasard sur la carte
@@ -330,7 +332,7 @@ public class TCPServer : MonoBehaviour
     {
         BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
         string jsonData = JsonUtility.ToJson(wrapper);
-        BroadcastTCPMessage(jsonData);
+        BroadcastTCPMessage("setbonus|" + jsonData);
     }
 
     private void UpdateConnectedClientsIds()

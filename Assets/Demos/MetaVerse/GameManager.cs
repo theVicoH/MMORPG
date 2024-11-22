@@ -9,8 +9,16 @@ public class GameManager : MonoBehaviour
 
     private Dictionary<string, GameObject> players = new Dictionary<string, GameObject>();
 
+    void Awake(){
+        //desactiver l'objet si je  suis  le client
+        if (!Globals.IsServer){
+            gameObject.SetActive(false);
+        }
+    }
+
+
     // Méthode pour démarrer le jeu
-    public void StartGame()
+    void Start()
     {
         int serverPort = 25000;
 
