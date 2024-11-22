@@ -1,26 +1,101 @@
 using UnityEngine;
+using System.Collections;
 
 public class ClientManager : MonoBehaviour
 {
+    public TCPClient tcpClient;
+    public GameObject engineerPrefab;
 
-    public UDPSender Sender;
+    public static string LocalPlayerID { get; private set; }
 
-    private float NextCoucouTimeout = -1;
-    void Awake(){
-    //desactiver l'objet si je ne suis pas le client
-        if (Globals.IsServer){
-        gameObject.SetActive(false);
+    private string playerID;
+    private GameObject playerInstance;
+
+    private void Start()
+    {
+        if (Globals.IsServer)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
+        if (tcpClient == null)
+        {
+            Debug.LogError("[ClientManager] TCPClient non assigné !");
+            return;
+        }
+
+        playerID = System.Guid.NewGuid().ToString();
+        LocalPlayerID = playerID;
+
+        Debug.Log($"[ClientManager] Génération de l'ID joueur local : {playerID}");
+        StartCoroutine(TryConnectToServer());
+    }
+
+    private IEnumerator TryConnectToServer()
+    {
+        int maxRetries = 5;
+        int retryCount = 0;
+        float retryDelay = 2f;
+
+        while (retryCount < maxRetries)
+        {
+            Debug.Log($"[ClientManager] Tentative de connexion au serveur (essai {retryCount + 1}/{maxRetries})...");
+
+            bool isConnected = tcpClient.Connect((string message) =>
+            {
+                Debug.Log($"[ClientManager] Message du serveur : {message}");
+            });
+
+            if (isConnected)
+            {
+                Debug.Log("[ClientManager] Connexion réussie !");
+                SendConnectMessage();
+                InstantiateLocalPlayer();
+                yield break;
+            }
+
+            retryCount++;
+            Debug.LogWarning("[ClientManager] Connexion échouée. Nouvelle tentative...");
+            yield return new WaitForSeconds(retryDelay);
+        }
+
+        Debug.LogError("[ClientManager] Impossible de se connecter au serveur après plusieurs tentatives !");
+    }
+
+    private void SendConnectMessage()
+    {
+        if (tcpClient != null && tcpClient.IsConnected)
+        {
+            string message = $"connect {playerID}";
+            tcpClient.SendTCPMessage(message);
+            Debug.Log($"[ClientManager] Message de connexion envoyé : {message}");
+        }
+        else
+        {
+            Debug.LogError("[ClientManager] TCPClient non connecté !");
         }
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
 
-    }
-
-    // Update is called once per frame
-    void Update()
+    private void InstantiateLocalPlayer()
     {
-        Sender.SendUDPMessage("coucou");
+        if (engineerPrefab == null)
+        {
+            Debug.LogError("[ClientManager] Prefab Engineer non assignée !");
+            return;
+        }
+
+        Vector3 spawnPosition = new Vector3(247.37f, 0.318325f, 248.2043f);
+        Quaternion spawnRotation = Quaternion.identity;
+
+        playerInstance = Instantiate(engineerPrefab, spawnPosition, spawnRotation);
+        playerInstance.name = $"Player_{playerID}";
+
+        var characterController = playerInstance.GetComponent<CharacterController>();
+        if (characterController != null)
+        {
+            characterController.playerID = playerID;
+        }
+        Debug.Log($"[ClientManager] Joueur instancié : ID = {playerID}, Position = {spawnPosition}");
     }
 }
