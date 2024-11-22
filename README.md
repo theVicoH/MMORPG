@@ -57,7 +57,7 @@ getBonus
     "bonuses": un tableau avec des BonusData
 }
 
-# EntityData est un objet composé comme ceci : 
+# BonusData est un objet composé comme ceci : 
 # public class BonusData
 # {
 #     public string ID;         // Identifiant unique du bonus
@@ -80,7 +80,7 @@ updateBonus bonusId bool
     "bonuses": un tableau avec des BonusData
 }
 
-# EntityData est un objet composé comme ceci : 
+# BonusData est un objet composé comme ceci : 
 # public class BonusData
 # {
 #     public string ID;         // Identifiant unique du bonus
