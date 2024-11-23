@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ClientManager : MonoBehaviour
 {
@@ -10,6 +11,18 @@ public class ClientManager : MonoBehaviour
 
     private string playerID;
     private GameObject playerInstance;
+
+    private List<Vector3> spawns = new List<Vector3>
+    {
+        new Vector3(253.32f, 1.34f, 248.2043f),
+        new Vector3(250.44f, 1.34f, 248.2043f),
+        new Vector3(247.38f, 1.34f, 248.2043f),
+        new Vector3(244.44f, 1.34f, 248.2043f),
+        new Vector3(241.58f, 1.34f, 248.2043f),
+        new Vector3(238.22f, 1.34f, 248.2043f),
+        new Vector3(235.35f, 1.34f, 248.2043f),
+        new Vector3(232.53f, 1.34f, 248.2043f),
+    };
 
     private void Start()
     {
@@ -84,8 +97,8 @@ public class ClientManager : MonoBehaviour
             Debug.LogError("[ClientManager] Prefab Engineer non assignée !");
             return;
         }
-        // ajouter les vrais positions
-        Vector3 spawnPosition = new Vector3(247.37f, 0.318325f, 248.2043f);
+        Vector3 spawnPosition = spawns[Random.Range(0, spawns.Count - 1)];
+        spawns.Remove(spawnPosition);
         Quaternion spawnRotation = Quaternion.identity;
 
         playerInstance = Instantiate(engineerPrefab, spawnPosition, spawnRotation);
