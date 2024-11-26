@@ -1,54 +1,60 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-
-public enum CharacterPlayer {
-  Player1,
-  Player2
-}
 
 public class CharacterController : MonoBehaviour
 {
-    public CharacterPlayer Player = CharacterPlayer.Player1;
-    public float WalkSpeed = 3;
-    public float RotateSpeed = 250;
-    Animator Anim;
-    MetaverseInput inputs;
-    InputAction PlayerAction;
-    Rigidbody rb;
+    public string playerID;
+    public float walkSpeed = 3f;
+    public float rotateSpeed = 250f;
 
+    private Rigidbody rb;
+    private Animator animator;
 
+    private Vector2 inputDirection;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Anim = GetComponent<Animator>();
-        inputs = new MetaverseInput();
-        switch (Player) {
-          case CharacterPlayer.Player1:
-            PlayerAction = inputs.Player1.Move;
-            break;
-          case CharacterPlayer.Player2:
-            PlayerAction = inputs.Player2.Move;
-            break;
-        }
-
-        PlayerAction.Enable();
-
         rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
+    void Update()
+    {
+        if (!IsLocalPlayer()) return;
+
+        inputDirection = GetZQSDInput();
+
+        if (animator != null)
+        {
+            animator.SetFloat("Walk", inputDirection.y);
+        }
+    }
+
     void FixedUpdate()
     {
-        Vector2 vec = PlayerAction.ReadValue<Vector2>();
-        Anim.SetFloat("Walk", vec.y);
+        if (!IsLocalPlayer()) return;
 
-        rb.MovePosition(rb.position + transform.forward * WalkSpeed * Time.fixedDeltaTime * vec.y);
+        Vector3 move = transform.forward * walkSpeed * Time.fixedDeltaTime * inputDirection.y;
+        rb.MovePosition(rb.position + move);
 
-        rb.MoveRotation(rb.rotation * Quaternion.AngleAxis(RotateSpeed * Time.fixedDeltaTime * vec.x, Vector3.up));
+        Quaternion rotation = Quaternion.AngleAxis(rotateSpeed * Time.fixedDeltaTime * inputDirection.x, Vector3.up);
+        rb.MoveRotation(rb.rotation * rotation);
     }
 
-    void OnDisable() {
-      PlayerAction.Disable();
+    private Vector2 GetZQSDInput()
+    {
+        float horizontal = 0f;
+        float vertical = 0f;
+
+        if (Input.GetKey(KeyCode.Z)) vertical += 1f;
+        if (Input.GetKey(KeyCode.S)) vertical -= 1f;
+        if (Input.GetKey(KeyCode.Q)) horizontal -= 1f;
+        if (Input.GetKey(KeyCode.D)) horizontal += 1f;
+
+        return new Vector2(horizontal, vertical).normalized;
+    }
+
+    private bool IsLocalPlayer()
+    {
+        return playerID == ClientManager.LocalPlayerID;
     }
 }
