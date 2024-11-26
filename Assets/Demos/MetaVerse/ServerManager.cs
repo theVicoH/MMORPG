@@ -6,12 +6,12 @@ public class ServerManager : MonoBehaviour
 
     private void Awake()
     {
-        /* // Désactiver l'objet si ce n'est pas le mode serveur
-                if (!Globals.IsServer)
-                {
-                    gameObject.SetActive(false);
-                    return;
-                } */
+        // Désactiver l'objet si ce n'est pas le mode serveur
+        if (!Globals.IsServer)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
     }
 
     private void Start()
