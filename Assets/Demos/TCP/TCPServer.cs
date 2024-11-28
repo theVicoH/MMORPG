@@ -104,6 +104,8 @@ public class TCPServer : MonoBehaviour
             isActive = true
         }
     };
+    public delegate void PlayerSpawnHandler(string playerID, Vector3 position, Quaternion rotation);
+    public event PlayerSpawnHandler OnPlayerSpawnReceived;
 
 
     public bool IsListening
@@ -216,20 +218,17 @@ public class TCPServer : MonoBehaviour
                 byte[] data = new byte[client.Available];
                 client.GetStream().Read(data, 0, client.Available);
 
-                string[] parts = ParseString(data).Split(' ');
+                string message = ParseString(data);
+                Debug.Log($"Message TCP reçu : {message}");
+                string[] parts = message.Split(' ');
                 string action = parts[0];
-
-                // TODO remplacer le randomSpawnPosition par des vrais positions sur la map pour faire apparaitres de gens au hasard sur la carte
-                Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0.318325f, Random.Range(-10, 10));
-                Vector3 initialRotation = new Vector3(0, 0, 0);
-                Vector3 defaultRotation = Vector3.zero;
 
                 try
                 {
                     if (action == "connect")
                     {
                         string clientId = parts[1];
-                        HandleConnect(clientId, (IPEndPoint)client.Client.RemoteEndPoint, randomPosition, defaultRotation, 0);
+                        HandleConnect(clientId, (IPEndPoint)client.Client.RemoteEndPoint, Vector3.zero, Vector3.zero, 0);
                     }
                     else if (action == "disconnect")
                     {
@@ -262,6 +261,31 @@ public class TCPServer : MonoBehaviour
                         string clientId = parts[1];
                         IncrementClientScore(clientId);
                         sendConnectedClientsIds();
+                    }
+                    else if (action == "spawn")
+                    {
+                        Debug.Log($"Message spawn reçu avec {parts.Length} parties"); // Log de debug
+                        if (parts.Length >= 8)
+                        {
+                            string playerID = parts[1];
+                            Vector3 position = new Vector3(
+                                float.Parse(parts[2]),
+                                float.Parse(parts[3]),
+                                float.Parse(parts[4])
+                            );
+                            Quaternion rotation = Quaternion.Euler(
+                                float.Parse(parts[5]),
+                                float.Parse(parts[6]),
+                                float.Parse(parts[7])
+                            );
+                            
+                            Debug.Log($"Traitement du spawn pour le joueur {playerID} à la position {position}");
+                            OnPlayerSpawnReceived?.Invoke(playerID, position, rotation);
+                        }
+                        else
+                        {
+                            Debug.LogError($"Format de message spawn invalide : {message}");
+                        }
                     }
                     else
                     {
@@ -359,4 +383,5 @@ public class TCPServer : MonoBehaviour
         Connections.Clear();
         OnMessageReceive = null;
     }
+    
 }

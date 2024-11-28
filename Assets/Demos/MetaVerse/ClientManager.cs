@@ -64,6 +64,7 @@ public class ClientManager : MonoBehaviour
             {
                 Debug.Log("[ClientManager] Connexion réussie !");
                 SendConnectMessage();
+                yield return new WaitForSeconds(0.5f);
                 InstantiateLocalPlayer();
                 yield break;
             }
@@ -94,9 +95,10 @@ public class ClientManager : MonoBehaviour
     {
         if (engineerPrefab == null)
         {
-            Debug.LogError("[ClientManager] Prefab Engineer non assignée !");
+            Debug.LogError("[ClientManager] Prefab Engineer non assigné !");
             return;
         }
+
         Vector3 spawnPosition = spawns[Random.Range(0, spawns.Count - 1)];
         spawns.Remove(spawnPosition);
         Quaternion spawnRotation = Quaternion.identity;
@@ -109,6 +111,11 @@ public class ClientManager : MonoBehaviour
         {
             characterController.playerID = playerID;
         }
-        Debug.Log($"[ClientManager] Joueur instancié : ID = {playerID}, Position = {spawnPosition}");
+
+        string spawnMessage = $"spawn {playerID} {spawnPosition.x} {spawnPosition.y} {spawnPosition.z} {spawnRotation.eulerAngles.x} {spawnRotation.eulerAngles.y} {spawnRotation.eulerAngles.z}";
+        Debug.Log($"[ClientManager] Envoi du message spawn : {spawnMessage}");
+        tcpClient.SendTCPMessage(spawnMessage);
+
+        Debug.Log($"[ClientManager] Joueur instancié et message d'instanciation envoyé : ID = {playerID}, Position = {spawnPosition}");
     }
 }
