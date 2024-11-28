@@ -23,9 +23,11 @@ public class ServerManager : MonoBehaviour
             Debug.LogError("[ServerManager] TCPServer non assigné !");
             return;
         }
-        Debug.Log("[ServerManager] Hallo");
         tcpServer.OnPlayerSpawnReceived += HandlePlayerSpawn;
+        tcpServer.OnPlayerDisconnectReceived += HandlePlayerDisconnect;
+        Debug.Log("[ServerManager] Hallo");
         StartListening();
+        
     }
 
     private void StartListening()
@@ -60,6 +62,16 @@ public class ServerManager : MonoBehaviour
 
             serverPlayers.Add(playerID, playerInstance);
             Debug.Log($"[ServerManager] Joueur instancié sur le serveur : ID = {playerID}, Position = {position}");
+        }
+    }
+    private void HandlePlayerDisconnect(string playerID)
+    {
+        if (serverPlayers.ContainsKey(playerID))
+        {
+            GameObject playerInstance = serverPlayers[playerID];
+            Destroy(playerInstance);
+            serverPlayers.Remove(playerID);
+            Debug.Log($"[ServerManager] Joueur déconnecté et supprimé du serveur : ID = {playerID}");
         }
     }
 }

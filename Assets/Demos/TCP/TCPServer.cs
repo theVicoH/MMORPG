@@ -3,8 +3,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Text;
+using System;
+using System.Linq;
 
-[System.Serializable]
+[Serializable]
 public class SerializableEndPoint
 {
     public string Address;
@@ -32,13 +34,13 @@ public class EntityData
     public int score;
 }
 
-[System.Serializable]
+[Serializable]
 public class EntityDataList
 {
     public List<string> entities;
 }
 
-[System.Serializable]
+[Serializable]
 public class BonusData
 {
     public string ID;
@@ -46,7 +48,7 @@ public class BonusData
     public bool isActive;
 }
 
-[System.Serializable]
+[Serializable]
 public class BonusListWrapper
 {
     public List<BonusData> bonuses;
@@ -64,6 +66,7 @@ public class TCPServer : MonoBehaviour
 
     public delegate void TCPMessageReceive(string message);
     private TCPMessageReceive OnMessageReceive;
+    public event Action<string> OnPlayerDisconnectReceived;
 
     private List<BonusData> bonus = new List<BonusData>
     {
@@ -209,6 +212,7 @@ public class TCPServer : MonoBehaviour
             if (!client.Connected)
             {
                 Debug.Log("Client disconnected");
+                HandleClientDisconnection(client);
                 Connections.Remove(client);
                 return;
             }
@@ -234,6 +238,7 @@ public class TCPServer : MonoBehaviour
                     {
                         string clientId = parts[1];
                         HandleDisconnect(clientId);
+                        OnPlayerDisconnectReceived?.Invoke(clientId);
                     }
                     else if(action == "getConnectedClientsIds")
                     {
@@ -314,10 +319,28 @@ public class TCPServer : MonoBehaviour
         sendConnectedClientsIds();
     }
 
-    private void HandleDisconnect(string clientId)
+    private void HandleClientDisconnection(TcpClient client)
     {
+        IPEndPoint remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
+        if (remoteEndPoint != null)
+        {
+            string clientId = ConnectedClients.FirstOrDefault(c => c.RemoteEndPoint.Address.ToString() == remoteEndPoint.Address.ToString())?.ID;
+            if (clientId != null)
+            {
+                HandleDisconnect(clientId);
+                OnPlayerDisconnectReceived?.Invoke(clientId);
+            }
+        }
+    }
+
+   private void HandleDisconnect(string clientId)
+    {
+        // Supprimer le client de la liste des clients connectés
         ConnectedClients.RemoveAll(client => client.ID == clientId);
         sendConnectedClientsIds();
+
+        // Supprimer le joueur du serveur
+        OnPlayerDisconnectReceived?.Invoke(clientId);
     }
 
     private void UpdateBonusIsActive(string bonusId, bool newIsActive)
