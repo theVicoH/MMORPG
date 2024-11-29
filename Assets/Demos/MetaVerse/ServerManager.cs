@@ -1,11 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Net;
 
 public class ServerManager : MonoBehaviour
 {
     public TCPServer tcpServer;
     public GameObject engineerPrefab;
     private Dictionary<string, GameObject> serverPlayers = new Dictionary<string, GameObject>();
+    public UDPService UDP;
+    public int ListenPort = 25000;
+
+    public Dictionary<string, IPEndPoint> Clients = new Dictionary<string, IPEndPoint>(); 
 
     private void Awake()
     {
@@ -27,7 +32,38 @@ public class ServerManager : MonoBehaviour
         tcpServer.OnPlayerDisconnectReceived += HandlePlayerDisconnect;
         Debug.Log("[ServerManager] Hallo");
         StartListening();
-        
+        UDP.Listen(ListenPort);
+    }
+
+    void Update()
+    {
+        UDP.OnMessageReceived +=  
+            (string message, IPEndPoint sender) => {
+                Debug.Log("[SERVER] Message received from " + 
+                    sender.Address.ToString() + ":" + sender.Port 
+                    + " =>" + message);
+                
+                switch (message) {
+                    case "coucou":
+                        // Ajouter le client à mon dictionnaire
+                        string addr = sender.Address.ToString() + ":" + sender.Port;
+                        if (!Clients.ContainsKey(addr)) {
+                            Clients.Add(addr, sender);
+                        }
+                        Debug.Log("There are " + Clients.Count + " clients present.");
+
+                        UDP.SendUDPMessage("welcome!", sender);
+                        break;
+                }
+                
+                //@todo : do something with the message that has arrived! 
+            };
+    }
+
+    public void BroadcastUDPMessage(string message) {
+        foreach (KeyValuePair<string, IPEndPoint> client in Clients) {
+            UDP.SendUDPMessage(message, client.Value);
+        }
     }
 
     private void StartListening()
