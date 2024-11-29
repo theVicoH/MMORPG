@@ -14,14 +14,14 @@ public class ClientManager : MonoBehaviour
 
     private List<Vector3> spawns = new List<Vector3>
     {
-        new Vector3(253.32f, 1.34f, 248.2043f),
-        new Vector3(250.44f, 1.34f, 248.2043f),
-        new Vector3(247.38f, 1.34f, 248.2043f),
-        new Vector3(244.44f, 1.34f, 248.2043f),
-        new Vector3(241.58f, 1.34f, 248.2043f),
-        new Vector3(238.22f, 1.34f, 248.2043f),
-        new Vector3(235.35f, 1.34f, 248.2043f),
-        new Vector3(232.53f, 1.34f, 248.2043f),
+        new Vector3(253.32f, 1.34f, 248.2043f)
+        // new Vector3(250.44f, 1.34f, 248.2043f),
+        // new Vector3(247.38f, 1.34f, 248.2043f),
+        // new Vector3(244.44f, 1.34f, 248.2043f),
+        // new Vector3(241.58f, 1.34f, 248.2043f),
+        // new Vector3(238.22f, 1.34f, 248.2043f),
+        // new Vector3(235.35f, 1.34f, 248.2043f),
+        // new Vector3(232.53f, 1.34f, 248.2043f),
     };
 
     private void Start()
@@ -43,6 +43,16 @@ public class ClientManager : MonoBehaviour
 
         Debug.Log($"[ClientManager] Génération de l'ID joueur local : {playerID}");
         StartCoroutine(TryConnectToServer());
+    }
+
+    private void OnApplicationQuit()
+    {
+        SendDisconnectMessage();
+    }
+
+    private void OnDisable()
+    {
+        SendDisconnectMessage();
     }
 
     private IEnumerator TryConnectToServer()
@@ -117,5 +127,15 @@ public class ClientManager : MonoBehaviour
         tcpClient.SendTCPMessage(spawnMessage);
 
         Debug.Log($"[ClientManager] Joueur instancié et message d'instanciation envoyé : ID = {playerID}, Position = {spawnPosition}");
+    }
+
+    private void SendDisconnectMessage()
+    {
+        if (tcpClient != null && tcpClient.IsConnected)
+        {
+            string message = $"disconnect {playerID}";
+            tcpClient.SendTCPMessage(message);
+            Debug.Log($"[ClientManager] Message de déconnexion envoyé : {message}");
+        }
     }
 }
