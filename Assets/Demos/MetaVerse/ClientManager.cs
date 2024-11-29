@@ -29,7 +29,7 @@ public class ClientManager : MonoBehaviour
     public string ServerIP = "127.0.0.1";
     public int ServerPort = 25000;
 
-    private IPEndPoint ServerEndpoint;
+    public IPEndPoint ServerEndpoint { get; private set; }
 
     void Awake() {
         if (Globals.IsServer) {

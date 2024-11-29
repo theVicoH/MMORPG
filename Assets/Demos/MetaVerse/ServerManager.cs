@@ -43,25 +43,40 @@ public class ServerManager : MonoBehaviour
                     sender.Address.ToString() + ":" + sender.Port 
                     + " =>" + message);
                 
-                switch (message) {
-                    case "coucou":
-                        // Ajouter le client à mon dictionnaire
-                        string addr = sender.Address.ToString() + ":" + sender.Port;
-                        if (!Clients.ContainsKey(addr)) {
-                            Clients.Add(addr, sender);
-                        }
-                        Debug.Log("There are " + Clients.Count + " clients present.");
+                if (message == "coucou") {
+                    string addr = sender.Address.ToString() + ":" + sender.Port;
+                    if (!Clients.ContainsKey(addr)) {
+                        Clients.Add(addr, sender);
+                    }
+                    Debug.Log("There are " + Clients.Count + " clients present.");
+                    UDP.SendUDPMessage("welcome!", sender);
+                    return;
+                }
+                
+                string[] parts = message.Split('|');
+                if (parts.Length < 2) return;
 
-                        UDP.SendUDPMessage("welcome!", sender);
+                string command = parts[0];
+                string content = parts[1];
+
+                switch (command) {
+                    case "POS":
+                        BroadcastUDPMessage(message, sender);
+                        break;
+
+                    default:
+                        Debug.LogWarning("Unknown message type: " + command);
                         break;
                 }
                 
-                //@todo : do something with the message that has arrived! 
             };
     }
 
-    public void BroadcastUDPMessage(string message) {
+    public void BroadcastUDPMessage(string message, IPEndPoint sender) {
         foreach (KeyValuePair<string, IPEndPoint> client in Clients) {
+            if (client.Value.Address.Equals(sender.Address) && client.Value.Port == sender.Port) {
+                continue;
+            }
             UDP.SendUDPMessage(message, client.Value);
         }
     }
