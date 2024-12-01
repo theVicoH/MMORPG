@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using Unity.Cinemachine;
 
 public class ClientManager : MonoBehaviour
 {
@@ -126,7 +127,7 @@ public class ClientManager : MonoBehaviour
         }
     }
 
-    private void InstantiateLocalPlayer()
+     private void InstantiateLocalPlayer()
     {
         if (engineerPrefab == null)
         {
@@ -145,6 +146,19 @@ public class ClientManager : MonoBehaviour
         if (characterController != null)
         {
             characterController.playerID = playerID;
+        }
+
+        // Utilisation de la nouvelle méthode recommandée
+        var virtualCamera = FindFirstObjectByType<CinemachineCamera>();
+        if (virtualCamera != null)
+        {
+            virtualCamera.Follow = playerInstance.transform;
+            virtualCamera.LookAt = playerInstance.transform;
+            Debug.Log("[ClientManager] Caméra Cinemachine configurée pour suivre le joueur");
+        }
+        else
+        {
+            Debug.LogError("[ClientManager] Pas de CinemachineVirtualCamera trouvée dans la scène!");
         }
 
         string spawnMessage = $"spawn {playerID} {spawnPosition.x} {spawnPosition.y} {spawnPosition.z} {spawnRotation.eulerAngles.x} {spawnRotation.eulerAngles.y} {spawnRotation.eulerAngles.z}";
