@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 public class UDPReceiver : MonoBehaviour
 {
-    public int ListenPort = 25000;
+    public int ListenPort = 25001;
     UdpClient udp;
     IPEndPoint localEP;
 

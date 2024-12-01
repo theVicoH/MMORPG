@@ -1,17 +1,11 @@
 using UnityEngine;
 using System.Net;
 
-[System.Serializable]
-public class CharacterState {
-    public Vector3 Position;
-    public Quaternion Rotation;
-    public float WalkAnimation;
-}
-
 public class CharacterSyncServer : MonoBehaviour
 {
     ServerManager ServerMan;
     Animator anim;
+
 
     void Awake() {
         if (!Globals.IsServer) {

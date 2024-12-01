@@ -24,10 +24,10 @@ public class ClientManager : MonoBehaviour
         // new Vector3(235.35f, 1.34f, 248.2043f),
         // new Vector3(232.53f, 1.34f, 248.2043f),
     };
-    private float NextCoucouTimeout = -1;
+    // private float NextCoucouTimeout = -1;
     public UDPService UDP;
     public string ServerIP = "127.0.0.1";
-    public int ServerPort = 25000;
+    public int ServerPort = 25001;
 
     public IPEndPoint ServerEndpoint { get; private set; }
 
@@ -64,10 +64,10 @@ public class ClientManager : MonoBehaviour
 
     void Update()
     {
-        if (Time.time > NextCoucouTimeout) {
-            UDP.SendUDPMessage("coucou", ServerEndpoint);
-            NextCoucouTimeout = Time.time + 0.5f;
-        }
+        // if (Time.time > NextCoucouTimeout) {
+        //     UDP.SendUDPMessage("coucou", ServerEndpoint);
+        //     NextCoucouTimeout = Time.time + 0.5f;
+        // }
     }
 
     private void OnApplicationQuit()

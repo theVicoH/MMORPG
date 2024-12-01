@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 public class UDPSender : MonoBehaviour
 {
-    public int DestinationPort = 25000;
+    public int DestinationPort = 25001;
     public string DestinationIP = "127.0.0.1";
     UdpClient udp;
     IPEndPoint localEP;

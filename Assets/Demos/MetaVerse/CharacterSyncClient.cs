@@ -22,6 +22,7 @@ public class CharacterSyncClient : MonoBehaviour
         if (Time.time > NextUpdateTimeout) {
             // Envoie l'état au serveur
             CharacterState state = new CharacterState{
+                PlayerID = ClientManager.LocalPlayerID,
                 Position = transform.position,
                 Rotation = transform.rotation,
                 WalkAnimation = anim.GetFloat("Walk")
