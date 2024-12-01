@@ -4,11 +4,12 @@ using System.Net.Sockets;
 
 public class UDPSender : MonoBehaviour
 {
-    public int DestinationPort = 25000;
+    public int DestinationPort = 25001;
     public string DestinationIP = "127.0.0.1";
-
     UdpClient udp;
     IPEndPoint localEP;
+    public UDPReceiver.UDPMessageReceive OnMessageReceived;
+
 
     public void SendUDPMessage(string message) {
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(message);
@@ -45,6 +46,35 @@ public class UDPSender : MonoBehaviour
             udp.Close();
             udp = null;
         }
+    }
+    void Update() {
+        ReceiveUDP();
+    }
+
+
+    private void ReceiveUDP() {
+        if (udp == null) { return; }
+
+        while (udp.Available > 0)
+		{
+            IPEndPoint sourceEP = new IPEndPoint(IPAddress.Any, 0);
+			byte[] data = udp.Receive(ref sourceEP);
+
+			try
+			{
+				ParseString(data, sourceEP);
+			}
+			catch (System.Exception ex)
+			{
+				Debug.LogWarning("Error receiving UDP message: " + ex.Message);
+			}
+		}
+    }
+
+    private void ParseString(byte[] bytes, IPEndPoint sender) {
+        string message = System.Text.Encoding.UTF8.GetString(bytes);
+
+        OnMessageReceived(message, sender);
     }
 
 }

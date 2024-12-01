@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 
 public class ClientManager : MonoBehaviour
 {
@@ -23,15 +24,21 @@ public class ClientManager : MonoBehaviour
         // new Vector3(235.35f, 1.34f, 248.2043f),
         // new Vector3(232.53f, 1.34f, 248.2043f),
     };
+    // private float NextCoucouTimeout = -1;
+    public UDPService UDP;
+    public string ServerIP = "127.0.0.1";
+    public int ServerPort = 25001;
+
+    public IPEndPoint ServerEndpoint { get; private set; }
+
+    void Awake() {
+        if (Globals.IsServer) {
+            gameObject.SetActive(false);
+        }
+    }
 
     private void Start()
     {
-        if (Globals.IsServer)
-        {
-            gameObject.SetActive(false);
-            return;
-        }
-
         if (tcpClient == null)
         {
             Debug.LogError("[ClientManager] TCPClient non assigné !");
@@ -43,6 +50,24 @@ public class ClientManager : MonoBehaviour
 
         Debug.Log($"[ClientManager] Génération de l'ID joueur local : {playerID}");
         StartCoroutine(TryConnectToServer());
+
+        UDP.InitClient();
+
+        ServerEndpoint = new IPEndPoint(IPAddress.Parse(ServerIP), ServerPort);
+            
+        UDP.OnMessageReceived += (string message, IPEndPoint sender) => {
+            Debug.Log("[CLIENT] Message received from " + 
+                sender.Address.ToString() + ":" + sender.Port 
+                + " =>" + message);
+        };
+    }
+
+    void Update()
+    {
+        // if (Time.time > NextCoucouTimeout) {
+        //     UDP.SendUDPMessage("coucou", ServerEndpoint);
+        //     NextCoucouTimeout = Time.time + 0.5f;
+        // }
     }
 
     private void OnApplicationQuit()
