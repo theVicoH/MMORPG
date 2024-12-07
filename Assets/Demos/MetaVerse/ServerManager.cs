@@ -177,6 +177,7 @@ public class ServerManager : MonoBehaviour
             if (characterController != null)
             {
                 characterController.playerID = playerID;
+                characterController.username = PlayerPrefs.GetString("PlayerName");
             }
 
             serverPlayers.Add(playerID, playerInstance);
