@@ -149,7 +149,7 @@ public class ClientManager : MonoBehaviour
         {
             characterController.playerID = playerID;
             characterController.username = PlayerPrefs.GetString("PlayerName");
-            Debug.Log("Test {characterController.username}");
+            Debug.Log($"Character name is {characterController.username}");
 
         }
 
