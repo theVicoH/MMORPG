@@ -117,7 +117,9 @@ public class ClientManager : MonoBehaviour
     {
         if (tcpClient != null && tcpClient.IsConnected)
         {
-            string message = $"connect {playerID}";
+            string username = PlayerPrefs.GetString("PlayerName");
+            string message = $"connect {playerID} {username}";
+            // string message = $"connect {playerID}";
             tcpClient.SendTCPMessage(message);
             Debug.Log($"[ClientManager] Message de connexion envoyé : {message}");
         }
@@ -127,7 +129,7 @@ public class ClientManager : MonoBehaviour
         }
     }
 
-     private void InstantiateLocalPlayer()
+     private void InstantiateLocalPlayer() 
     {
         if (engineerPrefab == null)
         {
@@ -146,6 +148,9 @@ public class ClientManager : MonoBehaviour
         if (characterController != null)
         {
             characterController.playerID = playerID;
+            characterController.username = PlayerPrefs.GetString("PlayerName");
+            Debug.Log("Test {characterController.username}");
+
         }
 
         // Utilisation de la nouvelle méthode recommandée
