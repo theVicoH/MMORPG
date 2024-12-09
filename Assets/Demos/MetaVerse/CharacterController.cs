@@ -5,11 +5,14 @@ public class CharacterController : MonoBehaviour
     public string playerID;
     public float walkSpeed = 3f;
     public float rotateSpeed = 250f;
+    public float smoothTime = 0.1f;
 
     private Rigidbody rb;
     private Animator animator;
 
     private Vector2 inputDirection;
+    private Vector3 currentVelocity;
+    private Vector3 targetVelocity;
 
     void Start()
     {
@@ -33,9 +36,12 @@ public class CharacterController : MonoBehaviour
     {
         if (!IsLocalPlayer()) return;
 
-        Vector3 move = transform.forward * walkSpeed * Time.fixedDeltaTime * inputDirection.y;
-        rb.MovePosition(rb.position + move);
-
+        targetVelocity = transform.forward * walkSpeed * inputDirection.y;
+        
+        Vector3 smoothVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref currentVelocity, smoothTime);
+        
+        rb.linearVelocity = smoothVelocity;
+        
         Quaternion rotation = Quaternion.AngleAxis(rotateSpeed * Time.fixedDeltaTime * inputDirection.x, Vector3.up);
         rb.MoveRotation(rb.rotation * rotation);
     }

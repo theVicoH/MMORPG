@@ -11,7 +11,7 @@ public class ServerManager : MonoBehaviour
     public UDPService UDP;
     public int ListenPort = 25001;
 
-    public Dictionary<string, IPEndPoint> Clients = new Dictionary<string, IPEndPoint>(); 
+    public Dictionary<string, IPEndPoint> Clients = new Dictionary<string, IPEndPoint>();
 
     private void Awake()
     {
@@ -45,10 +45,6 @@ public class ServerManager : MonoBehaviour
 
     private void ProcessMessage(string message, IPEndPoint sender)
     {
-        #if DEBUG
-        Debug.Log("[SERVER] Message received from " + sender.Address.ToString() + ":" + sender.Port + " =>" + message);
-        #endif
-
         string[] parts = message.Split('|');
         if (parts.Length < 2) return;
 
@@ -59,7 +55,14 @@ public class ServerManager : MonoBehaviour
         {
             case "CHAR_POS":
                 CharacterState state = JsonUtility.FromJson<CharacterState>(content);
-                UpdatePlayerPosition(state);
+                if (serverPlayers.TryGetValue(state.PlayerID, out GameObject playerObj))
+                {
+                    var syncServer = playerObj.GetComponent<CharacterSyncServer>();
+                    if (syncServer != null)
+                    {
+                        syncServer.OnStateReceived(state);
+                    }
+                }
                 BroadcastUDPMessage("CHAR_POS|" + content, sender);
                 break;
 
