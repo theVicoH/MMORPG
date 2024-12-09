@@ -51,13 +51,13 @@ public class BonusData
 [Serializable]
 public class BonusListWrapper
 {
-    public List<BonusData> bonuses;
+    public List<BonusData> bonus;
 }
 
 public class TCPServer : MonoBehaviour
 {
     public int ListenPort = 25000;
-    public string OnConnectionMessage = "Welcome client!";
+    // public string OnConnectionMessage = "Welcome client!";
 
     private TcpListener tcp;
     private List<TcpClient> Connections = new List<TcpClient>();
@@ -67,6 +67,8 @@ public class TCPServer : MonoBehaviour
     public delegate void TCPMessageReceive(string message);
     private TCPMessageReceive OnMessageReceive;
     public event Action<string> OnPlayerDisconnectReceived;
+
+    public BonusManager BonusMan;
 
     private List<BonusData> bonus = new List<BonusData>
     {
@@ -203,8 +205,8 @@ public class TCPServer : MonoBehaviour
             Connections.Add(tcpClient);
 
             // Welcome message
-            byte[] bytes = Encoding.UTF8.GetBytes(OnConnectionMessage);
-            SendTCPBytes(tcpClient, bytes);
+            // byte[] bytes = Encoding.UTF8.GetBytes(OnConnectionMessage);
+            // SendTCPBytes(tcpClient, bytes);
         }
 
         foreach (var client in Connections)
@@ -233,6 +235,7 @@ public class TCPServer : MonoBehaviour
                     {
                         string clientId = parts[1];
                         HandleConnect(clientId, (IPEndPoint)client.Client.RemoteEndPoint, Vector3.zero, Vector3.zero, 0);
+                        sendBonus();
                     }
                     else if (action == "disconnect")
                     {
@@ -370,14 +373,15 @@ public class TCPServer : MonoBehaviour
         UpdateConnectedClientsIds();
         EntityDataList dataList = new EntityDataList { entities = ConnectedClientsIds };
         string jsonData = JsonUtility.ToJson(dataList);
-        BroadcastTCPMessage(jsonData);
+        string prefixedAndSuffixedData = "CONNECTED_CLIENTS|" + jsonData + "||";
+        BroadcastTCPMessage(prefixedAndSuffixedData);
     }
 
     private void sendBonus()
     {
-        BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
-        string jsonData = JsonUtility.ToJson(wrapper);
-        BroadcastTCPMessage(jsonData);
+        string jsonBonus = JsonUtility.ToJson(new BonusListWrapper { bonus = bonus });
+        string prefixedData = "BONUS|" + jsonBonus + "||";
+        BroadcastTCPMessage(prefixedData);
     }
 
     private void UpdateConnectedClientsIds()

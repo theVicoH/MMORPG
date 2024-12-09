@@ -14,6 +14,8 @@ public class ClientManager : MonoBehaviour
     private string playerID;
     private GameObject playerInstance;
 
+    public BonusManager BonusMan;
+
     private List<Vector3> spawns = new List<Vector3>
     {
         new Vector3(253.32f, 1.34f, 248.2043f)
@@ -93,7 +95,14 @@ public class ClientManager : MonoBehaviour
 
             bool isConnected = tcpClient.Connect((string message) =>
             {
-                Debug.Log($"[ClientManager] Message du serveur : {message}");
+                string[] parts = message.Split("||");
+                foreach(var part in parts) {
+                    if (part.StartsWith("BONUS|")) {
+                        string[] bonus = part.Split('|');
+                        BonusListWrapper bonusListWrapper = JsonUtility.FromJson<BonusListWrapper>(bonus[1]);
+                        BonusMan.ApplyBonusUpdate(bonusListWrapper.bonus);
+                    }
+                }
             });
 
             if (isConnected)
