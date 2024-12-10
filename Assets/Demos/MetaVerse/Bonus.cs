@@ -4,6 +4,7 @@ public class Bonus : MonoBehaviour
 {
     public LayerMask CollisionLayers;
     public int Points = 1;
+    public string id = "";
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

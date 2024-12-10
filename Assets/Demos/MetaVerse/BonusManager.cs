@@ -20,7 +20,8 @@ public class BonusManager : MonoBehaviour
     public void ApplyBonusUpdate(List<BonusData> bonuses) {
         foreach(BonusData bonus in bonuses) {
             if (bonus.isActive) {
-                Instantiate(bonusPrefab, bonus.position, Quaternion.identity);
+                GameObject newBonus = Instantiate(bonusPrefab, bonus.position, Quaternion.identity);
+                newBonus.GetComponent<Bonus>().id = bonus.ID;
             }
         }
     }
