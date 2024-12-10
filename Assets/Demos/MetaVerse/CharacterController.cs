@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class CharacterController : MonoBehaviour
 {
-    public string playerID;
+    public string playerID;    
+    public string username;
     public float walkSpeed = 3f;
     public float rotateSpeed = 250f;
     public float smoothTime = 0.1f;
@@ -18,6 +19,11 @@ public class CharacterController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+
+        if (!Globals.IsServer) {
+            string playerName = Globals.playerName;
+            username = playerName;
+        }
     }
 
     void Update()

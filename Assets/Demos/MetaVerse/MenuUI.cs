@@ -6,12 +6,14 @@ public class MenuUI : MonoBehaviour
     public void SetRole(bool isServer)
     {
         Globals.IsServer = isServer;
-        Debug.Log(isServer ? "Mode Serveur sélectionné." : "Mode Client sélectionné.");
     }
 
     public void StartGame()
     {
-        Debug.Log("Chargement de la scène Metaverse...");
-        SceneManager.LoadScene("Metaverse");
+        if (Globals.IsServer){
+            SceneManager.LoadScene("Metaverse");
+        }else{
+            SceneManager.LoadScene("PlayerData");
+        }
     }
 }

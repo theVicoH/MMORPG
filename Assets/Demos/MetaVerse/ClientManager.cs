@@ -12,6 +12,7 @@ public class ClientManager : MonoBehaviour
     public static string LocalPlayerID { get; private set; }
 
     private string playerID;
+    string username = Globals.playerName;
     private GameObject playerInstance;
 
     public BonusManager BonusMan;
@@ -155,6 +156,7 @@ public class ClientManager : MonoBehaviour
         if (characterController != null)
         {
             characterController.playerID = playerID;
+            characterController.username = Globals.playerName;
         }
 
         // Utilisation de la nouvelle méthode recommandée
@@ -163,15 +165,14 @@ public class ClientManager : MonoBehaviour
         {
             virtualCamera.Follow = playerInstance.transform;
             virtualCamera.LookAt = playerInstance.transform;
-            Debug.Log("[ClientManager] Caméra Cinemachine configurée pour suivre le joueur");
         }
         else
         {
             Debug.LogError("[ClientManager] Pas de CinemachineVirtualCamera trouvée dans la scène!");
         }
 
-        string spawnMessage = $"spawn {playerID} {spawnPosition.x} {spawnPosition.y} {spawnPosition.z} {spawnRotation.eulerAngles.x} {spawnRotation.eulerAngles.y} {spawnRotation.eulerAngles.z}";
-        Debug.Log($"[ClientManager] Envoi du message spawn : {spawnMessage}");
+        string spawnMessage = $"spawn {playerID} {spawnPosition.x} {spawnPosition.y} {spawnPosition.z} {spawnRotation.eulerAngles.x} {spawnRotation.eulerAngles.y} {spawnRotation.eulerAngles.z} {username}";
+        
         tcpClient.SendTCPMessage(spawnMessage);
 
         Debug.Log($"[ClientManager] Joueur instancié et message d'instanciation envoyé : ID = {playerID}, Position = {spawnPosition}");
