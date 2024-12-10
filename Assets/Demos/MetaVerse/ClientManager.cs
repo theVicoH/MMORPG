@@ -157,7 +157,6 @@ public class ClientManager : MonoBehaviour
         {
             characterController.playerID = playerID;
             characterController.username = Globals.playerName;
-            Debug.Log($"Character name is {characterController.username}");
         }
 
         // Utilisation de la nouvelle méthode recommandée
@@ -166,7 +165,6 @@ public class ClientManager : MonoBehaviour
         {
             virtualCamera.Follow = playerInstance.transform;
             virtualCamera.LookAt = playerInstance.transform;
-            Debug.Log("[ClientManager] Caméra Cinemachine configurée pour suivre le joueur");
         }
         else
         {
@@ -174,7 +172,7 @@ public class ClientManager : MonoBehaviour
         }
 
         string spawnMessage = $"spawn {playerID} {spawnPosition.x} {spawnPosition.y} {spawnPosition.z} {spawnRotation.eulerAngles.x} {spawnRotation.eulerAngles.y} {spawnRotation.eulerAngles.z} {username}";
-        Debug.Log($"[ClientManager] Envoi du message spawn : {spawnMessage}");
+        
         tcpClient.SendTCPMessage(spawnMessage);
 
         Debug.Log($"[ClientManager] Joueur instancié et message d'instanciation envoyé : ID = {playerID}, Position = {spawnPosition}");

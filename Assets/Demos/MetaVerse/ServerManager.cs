@@ -32,7 +32,6 @@ public class ServerManager : MonoBehaviour
         tcpServer.OnPlayerSpawnReceived += HandlePlayerSpawn;
         tcpServer.OnPlayerDisconnectReceived += HandlePlayerDisconnect;
         UDP.OnMessageReceived += OnMessageReceived;
-        Debug.Log("[ServerManager] Hallo");
         StartListening();
         UDP.Listen(ListenPort);
     }
@@ -72,65 +71,7 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    // void Update()
-    // {
-    //     UDP.OnMessageReceived += (string message, IPEndPoint sender) => {
-    //         Debug.Log("[SERVER] Message received from " + sender.Address.ToString() + ":" + sender.Port + " =>" + message);
-
-    //         string[] parts = message.Split('|');
-    //         if (parts.Length < 2) return;
-
-    //         string command = parts[0];
-    //         string content = parts[1];
-
-    //         switch (command) {
-    //             case "CHAR_POS":
-    //                 CharacterState state = JsonUtility.FromJson<CharacterState>(content);
-    //                 UpdatePlayerPosition(state);
-    //                 BroadcastUDPMessage("CHAR_POS|" + content, sender);
-    //                 break;
-
-    //             default:
-    //                 Debug.LogWarning("Unknown message type: " + command);
-    //                 break;
-    //         }
-    //     };
-        // UDP.OnMessageReceived +=  
-        //     (string message, IPEndPoint sender) => {
-        //         Debug.Log("[SERVER] Message received from " + 
-        //             sender.Address.ToString() + ":" + sender.Port 
-        //             + " =>" + message);
-                
-        //         if (message == "coucou") {
-        //             string addr = sender.Address.ToString() + ":" + sender.Port;
-        //             if (!Clients.ContainsKey(addr)) {
-        //                 Clients.Add(addr, sender);
-        //             }
-        //             Debug.Log("There are " + Clients.Count + " clients present.");
-        //             UDP.SendUDPMessage("welcome!", sender);
-        //             return;
-        //         }
-                
-        //         string[] parts = message.Split('|');
-        //         if (parts.Length < 2) return;
-
-        //         string command = parts[0];
-        //         string content = parts[1];
-
-        //         switch (command) {
-        //             case "POS":
-        //                 CharacterState state = JsonUtility.FromJson<CharacterState>(content);
-        //                 UpdatePlayerPosition(state);
-        //                 BroadcastUDPMessage(message, sender);
-        //                 break;
-
-        //             default:
-        //                 Debug.LogWarning("Unknown message type: " + command);
-        //                 break;
-        //         }
-                
-        //     };
-    // }
+   
     private void UpdatePlayerPosition(CharacterState state)
     {
         if (serverPlayers.ContainsKey(state.PlayerID))
@@ -184,7 +125,6 @@ public class ServerManager : MonoBehaviour
             }
 
             serverPlayers.Add(playerID, playerInstance);
-            Debug.Log($"[ServerManager] Joueur instancié sur le serveur : ID = {playerID}, Position = {position}");
         }
     }
     private void HandlePlayerDisconnect(string playerID)
@@ -194,7 +134,6 @@ public class ServerManager : MonoBehaviour
             GameObject playerInstance = serverPlayers[playerID];
             Destroy(playerInstance);
             serverPlayers.Remove(playerID);
-            Debug.Log($"[ServerManager] Joueur déconnecté et supprimé du serveur : ID = {playerID}");
         }
     }
 }

@@ -23,13 +23,12 @@ public class PlayerData : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(playerInput))
         {
-            Globals.playerName = playerInput; // Save input to static variable
-            Debug.Log($"Player name saved: {Globals.playerName}");
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Metaverse"); // Load the next scene
+            Globals.playerName = playerInput;
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Metaverse");
         }
         else
         {
-            Debug.Log("Input is empty or invalid!");
+            Debug.Log("Les informations du champ username sont incorrectes");
         }
     }
 }

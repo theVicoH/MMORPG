@@ -23,7 +23,6 @@ public class CharacterController : MonoBehaviour
         if (!Globals.IsServer) {
             string playerName = Globals.playerName;
             username = playerName;
-            Debug.Log($"Player name: {username}");
         }
     }
 
