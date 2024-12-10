@@ -7,6 +7,7 @@ using Unity.Cinemachine;
 public class ClientManager : MonoBehaviour
 {
     public TCPClient tcpClient;
+    public TCPServer tcpServer;
     public GameObject engineerPrefab;
 
     public static string LocalPlayerID { get; private set; }
@@ -15,6 +16,7 @@ public class ClientManager : MonoBehaviour
     private GameObject playerInstance;
 
     public BonusManager BonusMan;
+    // public CharacterScore CharacterScore;
 
     private List<Vector3> spawns = new List<Vector3>
     {
@@ -47,6 +49,8 @@ public class ClientManager : MonoBehaviour
             Debug.LogError("[ClientManager] TCPClient non assigné !");
             return;
         }
+
+        tcpServer = GameObject.FindFirstObjectByType<TCPServer>();
 
         playerID = System.Guid.NewGuid().ToString();
         LocalPlayerID = playerID;
@@ -101,8 +105,23 @@ public class ClientManager : MonoBehaviour
                         string[] bonus = part.Split('|');
                         BonusListWrapper bonusListWrapper = JsonUtility.FromJson<BonusListWrapper>(bonus[1]);
                         BonusMan.ApplyBonusUpdate(bonusListWrapper.bonus);
+                    } else if(part.StartsWith("CONNECTED_CLIENTS")) {
+                        string[] connectedClients = part.Split('|');
+                        List<EntityData> tcpServerConnectedClients = tcpServer.ConnectedClients;
+                        Debug.Log(tcpServerConnectedClients.Count);
+                        // for (int i = 0; i < tcpServerConnectedClients.Count; i++) {
+                        //     Debug.Log(tcpServerConnectedClients[i]);
+                        // }
                     }
                 }
+                // if (message.StartsWith("UPDATEBONUS")) {
+                //     string[] splitedMessage = message.Split('|');
+                //     BonusMan.UpdateBonusIsActive(splitedMessage[1]);
+                // }
+                // else if (message.StartsWith("CLIENTSCORE")) {
+                //     string[] splitedMessage = message.Split('|');
+                //     CharacterScore.SetScore(int.Parse(splitedMessage[1]));
+                // }
             });
 
             if (isConnected)

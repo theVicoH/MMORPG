@@ -6,6 +6,8 @@ public class BonusManager : MonoBehaviour
     public TCPClient tcpClient;
     public GameObject bonusPrefab;
 
+    Dictionary<string, GameObject> localBonusDict = new Dictionary<string, GameObject>();
+
     void Start()
     {
         
@@ -22,7 +24,16 @@ public class BonusManager : MonoBehaviour
             if (bonus.isActive) {
                 GameObject newBonus = Instantiate(bonusPrefab, bonus.position, Quaternion.identity);
                 newBonus.GetComponent<Bonus>().id = bonus.ID;
+                localBonusDict[bonus.ID] = newBonus;
             }
         }
+    }
+
+    public void UpdateBonusIsActive(string bonusId) {
+        GameObject obj = localBonusDict[bonusId];
+        if (obj == null) return;
+
+        Destroy(obj);
+        localBonusDict.Remove(bonusId);
     }
 }

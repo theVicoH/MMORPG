@@ -394,7 +394,8 @@ public class TCPServer : MonoBehaviour
                         {
                             UpdateBonusIsActive(bonusId, false);
                         }
-                        sendBonus();
+                        string updateBonusMessage = "UPDATEBONUS|" + bonusId + "||";
+                        BroadcastTCPMessage(updateBonusMessage);
                     }
                     else if (action == "incrementScore")
                     {
@@ -402,6 +403,12 @@ public class TCPServer : MonoBehaviour
                         IncrementClientScore(clientId);
                         sendConnectedClientsIds();
                     }
+                    // else if (action == "getClientScore")
+                    // {
+                    //     string clientId = parts[1];
+                    //     int clientScore = getClientScore(clientId);
+                    //     string getClientScoreMessage = "CLIENTSCORE" + clientScore + "||";
+                    // }
                     else if (action == "spawn")
                     {
                         Debug.Log($"Message spawn reçu avec {parts.Length} parties"); // Log de debug
