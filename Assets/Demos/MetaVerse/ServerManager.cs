@@ -169,7 +169,7 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    private void HandlePlayerSpawn(string playerID, Vector3 position, Quaternion rotation)
+    private void HandlePlayerSpawn(string playerID, Vector3 position, Quaternion rotation, string username)
     {
         if (!serverPlayers.ContainsKey(playerID))
         {
@@ -180,6 +180,7 @@ public class ServerManager : MonoBehaviour
             if (characterController != null)
             {
                 characterController.playerID = playerID;
+                characterController.username = username;
             }
 
             serverPlayers.Add(playerID, playerInstance);
