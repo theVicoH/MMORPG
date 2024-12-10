@@ -11,7 +11,15 @@ public class MenuUI : MonoBehaviour
 
     public void StartGame()
     {
-        Debug.Log("Chargement de la scène Metaverse...");
-        SceneManager.LoadScene("Metaverse");
+        if (Globals.IsServer){
+            SceneManager.LoadScene("Metaverse");
+            Debug.Log("Launching the scene with server...");
+            Debug.Log("Chargement de la scène Metaverse...");
+
+        }else{
+            Debug.Log("Launching the scene with client...");
+            SceneManager.LoadScene("PlayerData");
+            
+        }
     }
 }
