@@ -7,4 +7,5 @@ public class CharacterState
     public Vector3 Position;
     public Quaternion Rotation;
     public float WalkAnimation;
+    public Vector3 Velocity;
 }
