@@ -75,39 +75,171 @@ public class TCPServer : MonoBehaviour
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(246.910385f, 0.785560608f, 254.503769f),
+            position = new Vector3(248.54f, 0.2789344f, 255.5f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(253.199997f, 0.785560608f, 252.179993f),
+            position = new Vector3(248.54f, 0.2789344f, 241f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(243.020004f, 0.785560608f, 252.179993f),
+            position = new Vector3(253.9f, 0.2789344f, 241f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(248.919998f, 0.785560608f, 238.419998f),
+            position = new Vector3(225.11f, 0.2789344f, 255.5f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(239.669998f, 0.785560608f, 242.979996f),
+            position = new Vector3(225.04f, 0.2789344f, 241f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(228.899994f, 0.785560608f, 252.580002f),
+            position = new Vector3(230.04f, 0.2789344f, 241f),
             isActive = true
-        }
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(179.97f, 0.2789344f, 242.8f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(179.97f, 0.2789344f, 256.77f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(174.6f, 0.2789344f, 256.77f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(118.4f, 0.2789344f, 239.2f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(160.9f, 0.2789344f, 289.01f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(160.9f, 0.2789344f, 283.79f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(131.6f, 0.2789344f, 305.7f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(156.06f, 0.2789344f, 343.86f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(185.89f, 0.2789344f, 343.86f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(213.5f, 0.2789344f, 320.08f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(229.65f, 0.2789344f, 343.76f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(243.12f, 0.2789344f, 331.4f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(253.6f, 0.2789344f, 309.7f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(284.3f, 0.2789344f, 306.7f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(324.5f, 0.2789344f, 309.2f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(315.3f, 0.2789344f, 296.1f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(228.1f, 0.2789344f, 279.8f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(351f, 0.2789344f, 247.8f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(311.5f, 0.2789344f, 207.1f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(268.9f, 0.2789344f, 202.4f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(268.9f, 0.2789344f, 190.3f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(251.3f, 0.2789344f, 170.5f),
+            isActive = true
+        },
     };
     public delegate void PlayerSpawnHandler(string playerID, Vector3 position, Quaternion rotation);
     public event PlayerSpawnHandler OnPlayerSpawnReceived;
