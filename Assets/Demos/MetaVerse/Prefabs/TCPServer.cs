@@ -32,6 +32,7 @@ public class EntityData
     public Vector3 position;
     public Vector3 rotation;
     public int score;
+    public string username;
 }
 
 [Serializable]
@@ -107,7 +108,7 @@ public class TCPServer : MonoBehaviour
             isActive = true
         }
     };
-    public delegate void PlayerSpawnHandler(string playerID, Vector3 position, Quaternion rotation);
+    public delegate void PlayerSpawnHandler(string playerID, Vector3 position, Quaternion rotation, string username);
     public event PlayerSpawnHandler OnPlayerSpawnReceived;
 
 
@@ -232,7 +233,8 @@ public class TCPServer : MonoBehaviour
                     if (action == "connect")
                     {
                         string clientId = parts[1];
-                        HandleConnect(clientId, (IPEndPoint)client.Client.RemoteEndPoint, Vector3.zero, Vector3.zero, 0);
+                        string username = parts[2];
+                        HandleConnect(clientId, (IPEndPoint)client.Client.RemoteEndPoint, Vector3.zero, Vector3.zero, 0, username);
                     }
                     else if (action == "disconnect")
                     {
@@ -270,7 +272,7 @@ public class TCPServer : MonoBehaviour
                     else if (action == "spawn")
                     {
                         Debug.Log($"Message spawn reçu avec {parts.Length} parties"); // Log de debug
-                        if (parts.Length >= 8)
+                        if (parts.Length >= 9)
                         {
                             string playerID = parts[1];
                             Vector3 position = new Vector3(
@@ -284,8 +286,10 @@ public class TCPServer : MonoBehaviour
                                 float.Parse(parts[7])
                             );
                             
-                            Debug.Log($"Traitement du spawn pour le joueur {playerID} à la position {position}");
-                            OnPlayerSpawnReceived?.Invoke(playerID, position, rotation);
+                            string username = parts[8];
+
+                            Debug.Log($"Traitement du spawn pour le joueur {playerID} {username} à la position {position}");
+                            OnPlayerSpawnReceived?.Invoke(playerID, position, rotation, username);
                         }
                         else
                         {
@@ -305,7 +309,7 @@ public class TCPServer : MonoBehaviour
         }
     }
 
-    private void HandleConnect(string clientId, IPEndPoint RemoteEndPoint, Vector3 position, Vector3 rotation, int score)
+    private void HandleConnect(string clientId, IPEndPoint RemoteEndPoint, Vector3 position, Vector3 rotation, int score, string username)
     {
         EntityData newClient = new EntityData
         {
@@ -313,7 +317,8 @@ public class TCPServer : MonoBehaviour
             RemoteEndPoint = new SerializableEndPoint(RemoteEndPoint),
             position = position,
             rotation = rotation,
-            score = score
+            score = score,
+            username = username
         };
         ConnectedClients.Add(newClient);
         sendConnectedClientsIds();

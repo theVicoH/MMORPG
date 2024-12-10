@@ -166,22 +166,30 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    private void HandlePlayerSpawn(string playerID, Vector3 position, Quaternion rotation)
+    private void HandlePlayerSpawn(string playerID, Vector3 position, Quaternion rotation, string username)
     {
         if (!serverPlayers.ContainsKey(playerID))
         {
             GameObject playerInstance = Instantiate(engineerPrefab, position, rotation);
             playerInstance.name = $"ServerPlayer_{playerID}";
+            // playerInstance.user = $"ServerPlayer_{playerID}";
             
             var characterController = playerInstance.GetComponent<CharacterController>();
             if (characterController != null)
             {
                 characterController.playerID = playerID;
-                characterController.username = PlayerPrefs.GetString("PlayerName");
+                characterController.username = username;
+                //Old
+                // characterController.username = PlayerPrefs.GetString("PlayerName");
             }
 
             serverPlayers.Add(playerID, playerInstance);
-            Debug.Log($"[ServerManager] Joueur instancié sur le serveur : ID = {playerID}, Position = {position}");
+            Debug.Log($"[ServerManager] Joueur instancié sur le serveur : ID = {playerID}, Username = {username} , Position = {position}");
+            Debug.Log($"[ServerManager] Assigned username '{characterController.username}' to player ID '{playerID}'");
+        }
+        else
+        {
+            Debug.LogError($"[ServerManager] CharacterController not found on the player prefab!");
         }
     }
     private void HandlePlayerDisconnect(string playerID)

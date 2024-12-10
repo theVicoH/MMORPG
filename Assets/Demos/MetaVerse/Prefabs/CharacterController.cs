@@ -17,9 +17,13 @@ public class CharacterController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
 
-        string playerName = PlayerPrefs.GetString("PlayerName", "Default Name");
-        username = playerName;
-        Debug.Log($"Player name: {username}");
+        //old
+        if (!Globals.IsServer) {
+            string playerName = Globals.playerName;
+            // string playerName = PlayerPrefs.GetString("PlayerName", "Default Name");
+            username = playerName;
+            Debug.Log($"Player name: {username}");
+        }
     }
 
     void Update()

@@ -12,7 +12,10 @@ public class ClientManager : MonoBehaviour
     public static string LocalPlayerID { get; private set; }
 
     private string playerID;
+    // private string username;
     private GameObject playerInstance;
+
+    string username = Globals.playerName;
 
     private List<Vector3> spawns = new List<Vector3>
     {
@@ -117,8 +120,12 @@ public class ClientManager : MonoBehaviour
     {
         if (tcpClient != null && tcpClient.IsConnected)
         {
-            string username = PlayerPrefs.GetString("PlayerName");
+            // string username = Globals.playerName;
             string message = $"connect {playerID} {username}";
+            //old
+            /*string username = PlayerPrefs.GetString("PlayerName");
+            string message = $"connect {playerID} {username}";*/
+
             // string message = $"connect {playerID}";
             tcpClient.SendTCPMessage(message);
             Debug.Log($"[ClientManager] Message de connexion envoyé : {message}");
@@ -148,7 +155,8 @@ public class ClientManager : MonoBehaviour
         if (characterController != null)
         {
             characterController.playerID = playerID;
-            characterController.username = PlayerPrefs.GetString("PlayerName");
+            characterController.username = Globals.playerName;
+            // characterController.username = PlayerPrefs.GetString("PlayerName");
             Debug.Log($"Character name is {characterController.username}");
 
         }
@@ -166,7 +174,7 @@ public class ClientManager : MonoBehaviour
             Debug.LogError("[ClientManager] Pas de CinemachineVirtualCamera trouvée dans la scène!");
         }
 
-        string spawnMessage = $"spawn {playerID} {spawnPosition.x} {spawnPosition.y} {spawnPosition.z} {spawnRotation.eulerAngles.x} {spawnRotation.eulerAngles.y} {spawnRotation.eulerAngles.z}";
+        string spawnMessage = $"spawn {playerID} {spawnPosition.x} {spawnPosition.y} {spawnPosition.z} {spawnRotation.eulerAngles.x} {spawnRotation.eulerAngles.y} {spawnRotation.eulerAngles.z} {username}";
         Debug.Log($"[ClientManager] Envoi du message spawn : {spawnMessage}");
         tcpClient.SendTCPMessage(spawnMessage);
 
