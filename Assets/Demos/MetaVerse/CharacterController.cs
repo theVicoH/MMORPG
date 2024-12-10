@@ -3,6 +3,7 @@ using UnityEngine;
 public class CharacterController : MonoBehaviour
 {
     public string playerID;
+    public string username;
     public float walkSpeed = 3f;
     public float rotateSpeed = 250f;
 
@@ -11,10 +12,14 @@ public class CharacterController : MonoBehaviour
 
     private Vector2 inputDirection;
 
-    void Start()
+    void Start() 
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+
+        string playerName = PlayerPrefs.GetString("PlayerName", "Default Name");
+        username = playerName;
+        Debug.Log($"Player name: {username}");
     }
 
     void Update()
