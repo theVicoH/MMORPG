@@ -51,13 +51,13 @@ public class BonusData
 [Serializable]
 public class BonusListWrapper
 {
-    public List<BonusData> bonuses;
+    public List<BonusData> bonus;
 }
 
 public class TCPServer : MonoBehaviour
 {
     public int ListenPort = 25000;
-    public string OnConnectionMessage = "Welcome client!";
+    // public string OnConnectionMessage = "Welcome client!";
 
     private TcpListener tcp;
     private List<TcpClient> Connections = new List<TcpClient>();
@@ -68,44 +68,178 @@ public class TCPServer : MonoBehaviour
     private TCPMessageReceive OnMessageReceive;
     public event Action<string> OnPlayerDisconnectReceived;
 
+    public BonusManager BonusMan;
+
     private List<BonusData> bonus = new List<BonusData>
     {
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(246.910385f, 0.785560608f, 254.503769f),
+            position = new Vector3(248.54f, 0.2789344f, 255.5f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(253.199997f, 0.785560608f, 252.179993f),
+            position = new Vector3(248.54f, 0.2789344f, 241f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(243.020004f, 0.785560608f, 252.179993f),
+            position = new Vector3(253.9f, 0.2789344f, 241f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(248.919998f, 0.785560608f, 238.419998f),
+            position = new Vector3(225.11f, 0.2789344f, 255.5f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(239.669998f, 0.785560608f, 242.979996f),
+            position = new Vector3(225.04f, 0.2789344f, 241f),
             isActive = true
         },
         new BonusData
         {
             ID = System.Guid.NewGuid().ToString(),
-            position = new Vector3(228.899994f, 0.785560608f, 252.580002f),
+            position = new Vector3(230.04f, 0.2789344f, 241f),
             isActive = true
-        }
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(179.97f, 0.2789344f, 242.8f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(179.97f, 0.2789344f, 256.77f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(174.6f, 0.2789344f, 256.77f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(118.4f, 0.2789344f, 239.2f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(160.9f, 0.2789344f, 289.01f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(160.9f, 0.2789344f, 283.79f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(131.6f, 0.2789344f, 305.7f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(156.06f, 0.2789344f, 343.86f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(185.89f, 0.2789344f, 343.86f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(213.5f, 0.2789344f, 320.08f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(229.65f, 0.2789344f, 343.76f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(243.12f, 0.2789344f, 331.4f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(253.6f, 0.2789344f, 309.7f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(284.3f, 0.2789344f, 306.7f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(324.5f, 0.2789344f, 309.2f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(315.3f, 0.2789344f, 296.1f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(228.1f, 0.2789344f, 279.8f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(351f, 0.2789344f, 247.8f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(311.5f, 0.2789344f, 207.1f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(268.9f, 0.2789344f, 202.4f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(268.9f, 0.2789344f, 190.3f),
+            isActive = true
+        },
+        new BonusData
+        {
+            ID = System.Guid.NewGuid().ToString(),
+            position = new Vector3(251.3f, 0.2789344f, 170.5f),
+            isActive = true
+        },
     };
     public delegate void PlayerSpawnHandler(string playerID, Vector3 position, Quaternion rotation);
     public event PlayerSpawnHandler OnPlayerSpawnReceived;
@@ -203,8 +337,8 @@ public class TCPServer : MonoBehaviour
             Connections.Add(tcpClient);
 
             // Welcome message
-            byte[] bytes = Encoding.UTF8.GetBytes(OnConnectionMessage);
-            SendTCPBytes(tcpClient, bytes);
+            // byte[] bytes = Encoding.UTF8.GetBytes(OnConnectionMessage);
+            // SendTCPBytes(tcpClient, bytes);
         }
 
         foreach (var client in Connections)
@@ -233,6 +367,7 @@ public class TCPServer : MonoBehaviour
                     {
                         string clientId = parts[1];
                         HandleConnect(clientId, (IPEndPoint)client.Client.RemoteEndPoint, Vector3.zero, Vector3.zero, 0);
+                        sendBonus();
                     }
                     else if (action == "disconnect")
                     {
@@ -370,14 +505,15 @@ public class TCPServer : MonoBehaviour
         UpdateConnectedClientsIds();
         EntityDataList dataList = new EntityDataList { entities = ConnectedClientsIds };
         string jsonData = JsonUtility.ToJson(dataList);
-        BroadcastTCPMessage(jsonData);
+        string prefixedAndSuffixedData = "CONNECTED_CLIENTS|" + jsonData + "||";
+        BroadcastTCPMessage(prefixedAndSuffixedData);
     }
 
     private void sendBonus()
     {
-        BonusListWrapper wrapper = new BonusListWrapper { bonuses = bonus };
-        string jsonData = JsonUtility.ToJson(wrapper);
-        BroadcastTCPMessage(jsonData);
+        string jsonBonus = JsonUtility.ToJson(new BonusListWrapper { bonus = bonus });
+        string prefixedData = "BONUS|" + jsonBonus + "||";
+        BroadcastTCPMessage(prefixedData);
     }
 
     private void UpdateConnectedClientsIds()
