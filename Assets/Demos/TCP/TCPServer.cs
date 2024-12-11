@@ -333,14 +333,17 @@ public class TCPServer : MonoBehaviour
         }
     }
 
-   private void HandleDisconnect(string clientId)
+    private void HandleDisconnect(string clientId)
     {
-        // Supprimer le client de la liste des clients connectés
-        ConnectedClients.RemoveAll(client => client.ID == clientId);
-        sendConnectedClientsIds();
-
-        // Supprimer le joueur du serveur
-        OnPlayerDisconnectReceived?.Invoke(clientId);
+    Debug.Log($"[Server] Tentative de déconnexion du joueur : {clientId}");
+    
+    // Supprimer le client de la liste des clients connectés
+    ConnectedClients.RemoveAll(client => client.ID == clientId);
+    sendConnectedClientsIds();
+    Debug.Log($"[Server] Joueur déconnecté et nettoyé : {clientId}");
+    BroadcastTCPMessage($"disconnect_success {clientId}");
+    Debug.Log($"[Server] Déclenchement de l'événement OnPlayerDisconnectReceived pour {clientId}");
+    OnPlayerDisconnectReceived?.Invoke(clientId);
     }
 
     private void UpdateBonusIsActive(string bonusId, bool newIsActive)

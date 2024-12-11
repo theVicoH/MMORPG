@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using System.Linq;
 
 public class ServerManager : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class ServerManager : MonoBehaviour
     public int ListenPort = 25001;
 
     public Dictionary<string, IPEndPoint> Clients = new Dictionary<string, IPEndPoint>(); 
+
+    private bool isDisconnecting = false;
+    private Queue<string> disconnectionQueue = new Queue<string>();
 
     private void Awake()
     {
@@ -183,15 +187,94 @@ public class ServerManager : MonoBehaviour
             Debug.Log($"[ServerManager] Joueur instancié sur le serveur : ID = {playerID}, Position = {position}");
         }
     }
+    private async Task HandlePlayerDisconnectAsync(string playerID)
+    {
+        if (isDisconnecting)
+        {
+            disconnectionQueue.Enqueue(playerID);
+            Debug.Log($"[ServerManager] Joueur {playerID} mis en file d'attente pour déconnexion");
+            return;
+        }
+
+        isDisconnecting = true;
+        try
+        {
+            // Nettoyer l'ID du joueur en retirant tous les "disconnect" potentiels
+            string cleanPlayerID = playerID;
+            while (cleanPlayerID.Contains("disconnect"))
+            {
+                cleanPlayerID = cleanPlayerID.Replace("disconnect", "").Trim();
+            }
+            
+            Debug.Log($"[ServerManager] Début de la déconnexion pour le joueur : {cleanPlayerID}");
+            
+            if (serverPlayers.ContainsKey(cleanPlayerID))
+            {
+                GameObject playerInstance = serverPlayers[cleanPlayerID];
+                Debug.Log($"[ServerManager] Destruction de l'instance serveur du joueur : {cleanPlayerID}");
+                
+                // Retirer d'abord du dictionnaire
+                serverPlayers.Remove(cleanPlayerID);
+                
+                // Attendre une frame pour s'assurer que tout est bien traité
+                await Task.Yield();
+                
+                // Détruire l'objet
+                if (playerInstance != null)
+                {
+                    Destroy(playerInstance);
+                    Debug.Log($"[ServerManager] Instance du joueur détruite : ID = {cleanPlayerID}");
+                }
+                
+                // Nettoyer les clients UDP
+                string clientKey = Clients.Keys.FirstOrDefault(k => k.Contains(cleanPlayerID));
+                if (!string.IsNullOrEmpty(clientKey))
+                {
+                    Clients.Remove(clientKey);
+                    Debug.Log($"[ServerManager] Client UDP supprimé : {clientKey}");
+                }
+                
+                // Attendre encore une frame pour s'assurer que tout est bien nettoyé
+                await Task.Yield();
+            }
+            else
+            {
+                Debug.LogWarning($"[ServerManager] Aucune instance serveur trouvée pour le joueur : {cleanPlayerID}");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[ServerManager] Erreur lors de la déconnexion du joueur : {e.Message}\n{e.StackTrace}");
+        }
+        finally
+        {
+            isDisconnecting = false;
+            Debug.Log($"[ServerManager] Déconnexion terminée pour le joueur");
+            
+            // Traiter la prochaine déconnexion en attente s'il y en a
+            if (disconnectionQueue.Count > 0)
+            {
+                string nextPlayerID = disconnectionQueue.Dequeue();
+                _ = HandlePlayerDisconnectAsync(nextPlayerID);
+            }
+        }
+    }
+
     private void HandlePlayerDisconnect(string playerID)
     {
-        if (serverPlayers.ContainsKey(playerID))
+        _ = HandlePlayerDisconnectAsync(playerID);
+    }
+
+    private async void OnApplicationQuit()
+    {
+        Debug.Log("[ServerManager] Nettoyage des joueurs avant fermeture...");
+        var players = serverPlayers.ToList();
+        foreach (var player in players)
         {
-            GameObject playerInstance = serverPlayers[playerID];
-            Destroy(playerInstance);
-            serverPlayers.Remove(playerID);
-            Debug.Log($"[ServerManager] Joueur déconnecté et supprimé du serveur : ID = {playerID}");
+            await HandlePlayerDisconnectAsync(player.Key);
         }
+        serverPlayers.Clear();
+        Clients.Clear();
     }
 }
 

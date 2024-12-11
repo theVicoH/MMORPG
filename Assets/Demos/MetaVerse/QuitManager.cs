@@ -45,7 +45,7 @@ public class QuitManager : MonoBehaviour
 
     public void QuitGame()
     {
-        Debug.Log("[QuitManager] Déconnexion et suppression du joueur...");
+        Debug.Log("[QuitManager] Déconnexion et suppression du joueur....");
 
         if (clientManager != null)
         {

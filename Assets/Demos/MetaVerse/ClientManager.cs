@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using Unity.Cinemachine;
+using UnityEngine.SceneManagement;
 
 public class ClientManager : MonoBehaviour
 {
@@ -168,7 +169,7 @@ public class ClientManager : MonoBehaviour
         Debug.Log($"[ClientManager] Joueur instancié et message d'instanciation envoyé : ID = {playerID}, Position = {spawnPosition}");
     }
 
-    private void SendDisconnectMessage()
+    public void SendDisconnectMessage()
     {
         if (tcpClient != null && tcpClient.IsConnected)
         {
@@ -176,5 +177,19 @@ public class ClientManager : MonoBehaviour
             tcpClient.SendTCPMessage(message);
             Debug.Log($"[ClientManager] Message de déconnexion envoyé : {message}");
         }
+    }
+    
+
+    public void DestroyPlayer()
+    {
+        SendDisconnectMessage();
+        if (playerInstance != null)
+        {
+            Debug.Log($"[ClientManager] Suppression du joueur local : {playerInstance.name}");
+            Destroy(playerInstance);
+            playerInstance = null;
+        }
+        Debug.Log("[ClientManager] Retour au menu principal...");
+        SceneManager.LoadScene("ServeurClientMenu");
     }
 }
